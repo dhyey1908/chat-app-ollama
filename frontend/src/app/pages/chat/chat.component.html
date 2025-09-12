@@ -1,0 +1,28 @@
+<div class="chat-container">
+  <div class="chat-header">
+    <span class="logo">🤖 Chatbot UI</span>
+  </div>
+
+  <div class="chat-messages" #scrollMe>
+    <div *ngFor="let msg of messages" class="message" [ngClass]="msg.from">
+      <mat-card>
+        <!-- User text plain -->
+        <p *ngIf="msg.from === 'user'">{{ msg.text }}</p>
+
+        <!-- Bot text rendered as Markdown -->
+        <markdown *ngIf="msg.from === 'bot'" [data]="msg.text"></markdown>
+      </mat-card>
+    </div>
+  </div>
+
+
+  <div class="chat-input">
+    <mat-form-field class="input-field" appearance="outline">
+      <input matInput [(ngModel)]="userInput" placeholder="Type a message..." (keyup.enter)="sendMessage()"
+        [disabled]="isLoading" />
+    </mat-form-field>
+    <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="isLoading">
+      <mat-icon>send</mat-icon>
+    </button>
+  </div>
+</div>

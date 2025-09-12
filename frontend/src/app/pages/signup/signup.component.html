@@ -1,0 +1,24 @@
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <div class="logo">UI</div>
+    <h2>Create Account</h2>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" placeholder="you@example.com" [(ngModel)]="email">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" [(ngModel)]="password">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Confirm Password</mat-label>
+      <input matInput type="password" [(ngModel)]="confirmPassword">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" class="full-width" (click)="signup()">Sign Up</button>
+    <button mat-stroked-button class="full-width" routerLink="/login">Back to Login</button>
+  </mat-card>
+</div>

@@ -1,0 +1,31 @@
+<div class="auth-container">
+  <mat-card class="auth-card">
+    <div class="logo">UI</div>
+    <h2>Chatbot UI</h2>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput type="email" placeholder="you@example.com" [(ngModel)]="email">
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Password</mat-label>
+      <input matInput type="password" [(ngModel)]="password">
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" class="full-width" (click)="login()">Login</button>
+    <button mat-raised-button color="accent" class="full-width" routerLink="/signup">Sign Up</button>
+
+    <div class="divider">
+      <span>OR</span>
+    </div>
+
+    <button mat-raised-button class="google-btn full-width">
+      <mat-icon>google</mat-icon> Continue with Google
+    </button>
+
+    <p class="forgot">
+      Forgot your password? <a href="#">Reset</a>
+    </p>
+  </mat-card>
+</div>

@@ -1,0 +1,67 @@
+.auth-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #fafafa;
+}
+
+.auth-card {
+  width: 400px;
+  padding: 2rem;
+  text-align: center;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  display: inline-block;
+  background: black;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+h2 {
+  margin-bottom: 2rem;
+  font-weight: bold;
+}
+
+.full-width {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.divider {
+  margin: 1.5rem 0;
+  display: flex;
+  align-items: center;
+  color: #aaa;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #ddd;
+}
+
+.divider span {
+  margin: 0 1rem;
+}
+
+.google-btn {
+  background: #000;
+  color: #fff;
+}
+
+.google-btn mat-icon {
+  margin-right: 8px;
+}
+
+.forgot {
+  margin-top: 1rem;
+  font-size: 14px;
+}

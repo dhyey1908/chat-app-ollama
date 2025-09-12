@@ -1,0 +1,23 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+
+  .logo {
+    font-weight: 700;
+    font-size: 1.2rem;
+    cursor: pointer;
+  }
+
+  .spacer {
+    flex: 1;
+  }
+
+  a {
+    margin-right: 10px;
+  }
+
+  button {
+    margin-right: 10px;
+  }
+}

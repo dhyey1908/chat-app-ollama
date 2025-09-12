@@ -1,0 +1,25 @@
+<div class="contact-container">
+  <h1>Contact Us</h1>
+  <p>Have any questions or suggestions? Fill out the form below and we’ll get back to you.</p>
+
+  <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Name</mat-label>
+      <input matInput formControlName="name" placeholder="John Doe" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Email</mat-label>
+      <input matInput formControlName="email" placeholder="you@example.com" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Message</mat-label>
+      <textarea matInput rows="4" formControlName="message"></textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit" [disabled]="contactForm.invalid">
+      Send Message
+    </button>
+  </form>
+</div>
