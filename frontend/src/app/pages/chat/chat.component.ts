@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MarkdownModule } from 'ngx-markdown';
 import { MatSelectModule } from '@angular/material/select';
 import { ChatService } from '../../services/chat.service';
+import { Subscription } from 'rxjs';
 
 interface Message {
   from: 'user' | 'bot';
@@ -44,8 +45,12 @@ export class ChatComponent implements OnInit {
   isLoading: boolean = false;
   selectedModel: string = 'gemma3:270m';
   sidebarOpen: boolean = true;
-  historyCleared = true;
+  historyCleared = false;
   currentMessage = '';
+  private botSubscription?: Subscription;
+
+  // track last user message for "Try Again"
+  lastUserMessage: string | null = null;
 
   greetings = [
     'Hi there 👋 What’s on your mind today?',
@@ -76,12 +81,19 @@ export class ChatComponent implements OnInit {
   }
 
   startNewChat() {
-    const chat = this.chatService.createChat('New Chat');
-    this.chats = this.chatService.getChats();
-    this.activeChat = chat;
+    const existingEmptyChat = this.chats.find(chat => chat.messages.length === 0);
 
-    this.historyCleared = true;
-    this.currentMessage = this.getRandomGreeting();
+    if (existingEmptyChat) {
+      this.activeChat = existingEmptyChat;
+      this.historyCleared = true;
+      this.currentMessage = this.getRandomGreeting();
+    } else {
+      const chat = this.chatService.createChat('New Chat');
+      this.chats = this.chatService.getChats();
+      this.activeChat = chat;
+      this.historyCleared = true;
+      this.currentMessage = this.getRandomGreeting();
+    }
   }
 
   private getRandomGreeting(): string {
@@ -91,15 +103,19 @@ export class ChatComponent implements OnInit {
 
   selectChat(chat: Chat) {
     this.activeChat = chat;
-    this.historyCleared = false;
+    if (chat.messages.length === 0) {
+      this.historyCleared = true;
+      this.currentMessage = this.getRandomGreeting();
+    } else {
+      this.historyCleared = false;
+    }
   }
 
   removeChat(chat: Chat, event: Event) {
-    event.stopPropagation(); // prevent selecting chat
+    event.stopPropagation();
     this.chatService.removeChat(chat.id);
     this.chats = this.chatService.getChats();
 
-    // if active chat was removed, select another one
     if (this.activeChat?.id === chat.id) {
       if (this.chats.length > 0) {
         this.activeChat = this.chats[0];
@@ -116,14 +132,15 @@ export class ChatComponent implements OnInit {
     this.startNewChat();
   }
 
-
   sendMessage() {
     if (!this.userInput.trim() || this.isLoading) return;
 
     const userMessage: Message = { from: 'user', text: this.userInput };
     this.activeChat.messages.push(userMessage);
 
-    // 🔹 If it's the first message, use it as the chat title
+    // store last user input for "try again"
+    this.lastUserMessage = this.userInput;
+
     if (this.activeChat.messages.length === 1) {
       this.activeChat.title = userMessage.text.length > 20
         ? userMessage.text.slice(0, 20) + '...'
@@ -139,7 +156,7 @@ export class ChatComponent implements OnInit {
     this.activeChat.messages.push(botMessage);
     this.chatService.updateChat(this.activeChat);
 
-    this.chatService.sendMessage(this.activeChat, userMessage.text).subscribe({
+    this.botSubscription = this.chatService.sendMessage(this.activeChat, userMessage.text).subscribe({
       next: (chunk) => {
         botMessage.text += chunk;
         this.chatService.updateChat(this.activeChat);
@@ -154,6 +171,46 @@ export class ChatComponent implements OnInit {
         this.chatService.updateChat(this.activeChat);
       }
     });
+
     this.historyCleared = false;
+  }
+
+  stopResponse() {
+    if (this.botSubscription) {
+      this.botSubscription.unsubscribe();
+      this.botSubscription = undefined;
+      this.isLoading = false;
+    }
+  }
+
+  tryAgain() {
+    if (!this.lastUserMessage || this.isLoading) return;
+
+    // remove last bot message
+    const lastBotIndex = this.activeChat.messages.map(m => m.from).lastIndexOf('bot');
+    if (lastBotIndex !== -1) {
+      this.activeChat.messages.splice(lastBotIndex, 1);
+    }
+
+    const botMessage: Message = { from: 'bot', text: '' };
+    this.activeChat.messages.push(botMessage);
+    this.chatService.updateChat(this.activeChat);
+
+    this.isLoading = true;
+    this.botSubscription = this.chatService.sendMessage(this.activeChat, this.lastUserMessage).subscribe({
+      next: (chunk) => {
+        botMessage.text += chunk;
+        this.chatService.updateChat(this.activeChat);
+      },
+      error: () => {
+        botMessage.text += '\n⚠️ Error: could not reach server.';
+        this.isLoading = false;
+        this.chatService.updateChat(this.activeChat);
+      },
+      complete: () => {
+        this.isLoading = false;
+        this.chatService.updateChat(this.activeChat);
+      }
+    });
   }
 }

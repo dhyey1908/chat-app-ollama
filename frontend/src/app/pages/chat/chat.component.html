@@ -17,13 +17,14 @@
   <h3>Chats History</h3>
   <button mat-button color="primary" (click)="startNewChat()">+ New Chat</button>
   <button mat-button color="warn" (click)="clearAllChats()">🗑 Clear All</button>
-  <!-- <div class="chat-list"> -->
-  <button mat-button *ngFor="let chat of chats" (click)="selectChat(chat)" [class.active]="chat.id === activeChat.id">
-    {{ chat.title }}
-    <button mat-icon-button color="warn" (click)="removeChat(chat, $event)">
-      <mat-icon>delete</mat-icon>
-    </button> </button>
-  <!-- </div> -->
+
+  <div class="chat-list">
+    <div class="chat-item" *ngFor="let chat of chats" [class.active]="chat.id === activeChat.id">
+      <span class="chat-title" (click)="selectChat(chat)">{{ chat.title }}</span>
+
+      <mat-icon color="warn" (click)="removeChat(chat, $event)">delete</mat-icon>
+    </div>
+  </div>
 </div>
 
 <!-- Wrapper to move chat container when sidebar opens -->
@@ -39,22 +40,31 @@
         <p>{{ currentMessage }}</p>
       </div>
 
-      <div *ngFor="let msg of activeChat.messages" class="message" [ngClass]="msg.from">
-        <mat-card>
-          <p *ngIf="msg.from === 'user'">{{ msg.text }}</p>
-          <markdown *ngIf="msg.from === 'bot'" [data]="msg.text"></markdown>
-          <div *ngIf="msg.from === 'bot' && !msg.text && isLoading" class="dot-loader"></div>
-        </mat-card>
+      <div *ngFor="let msg of activeChat.messages; let i = index">
+        <div class="message" [ngClass]="msg.from">
+          <mat-card>
+            <p *ngIf="msg.from === 'user'">{{ msg.text }}</p>
+            <markdown *ngIf="msg.from === 'bot'" [data]="msg.text"></markdown>
+            <div *ngIf="msg.from === 'bot' && !msg.text && isLoading" class="dot-loader"></div>
+          </mat-card>
+        </div>
+        <div *ngIf="msg.from === 'bot' && i === activeChat.messages.length - 1 && !isLoading && lastUserMessage"
+          class="try-again">
+          <span color="primary" (click)="tryAgain()">
+            <mat-icon>loop</mat-icon>
+          </span>
+        </div>
       </div>
     </div>
 
     <div class="chat-input">
       <mat-form-field class="input-field" appearance="outline">
-        <input matInput [(ngModel)]="userInput" placeholder="Type a message..." (keyup.enter)="sendMessage()"
-          [disabled]="isLoading" />
+        <textarea matInput [(ngModel)]="userInput" placeholder="Type a message..." cdkTextareaAutosize
+          cdkAutosizeMinRows="1" cdkAutosizeMaxRows="5" (keyup.enter)="sendMessage()" [disabled]="isLoading">
+        </textarea>
       </mat-form-field>
-      <button mat-icon-button color="primary" (click)="sendMessage()" [disabled]="isLoading">
-        <mat-icon>send</mat-icon>
+      <button mat-icon-button color="primary" (click)="isLoading ? stopResponse() : sendMessage()">
+        <mat-icon>{{ isLoading ? 'stop' : 'send' }}</mat-icon>
       </button>
     </div>
   </div>
