@@ -53,13 +53,13 @@ export class ChatService {
   }
 
 
-  sendMessage(chat: Chat, prompt: string): Observable<string> {
+  sendMessage(chat: Chat, prompt: string, model:string): Observable<string> {
     return new Observable<string>(observer => {
       fetch(this.apiUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gemma3:270m',
+          model: model,
           messages: chat.messages // 🔹 full history
         })
       }).then(async res => {

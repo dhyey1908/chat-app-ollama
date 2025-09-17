@@ -10,6 +10,8 @@ import { MarkdownModule } from 'ngx-markdown';
 import { MatSelectModule } from '@angular/material/select';
 import { ChatService } from '../../services/chat.service';
 import { Subscription } from 'rxjs';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
+import { MatDialog } from '@angular/material/dialog';
 
 interface Message {
   from: 'user' | 'bot';
@@ -65,7 +67,7 @@ export class ChatComponent implements OnInit {
     'Let’s start the conversation 💬'
   ];
 
-  constructor(private chatService: ChatService) { }
+  constructor(private chatService: ChatService, private dialog: MatDialog) { }
 
   ngOnInit() {
     this.chats = this.chatService.getChats();
@@ -113,23 +115,46 @@ export class ChatComponent implements OnInit {
 
   removeChat(chat: Chat, event: Event) {
     event.stopPropagation();
-    this.chatService.removeChat(chat.id);
-    this.chats = this.chatService.getChats();
 
-    if (this.activeChat?.id === chat.id) {
-      if (this.chats.length > 0) {
-        this.activeChat = this.chats[0];
-        this.historyCleared = false;
-      } else {
-        this.startNewChat();
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Chat',
+        message: 'Are you sure you want to delete this chat?'
       }
-    }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.chatService.removeChat(chat.id);
+        this.chats = this.chatService.getChats();
+
+        if (this.activeChat?.id === chat.id) {
+          if (this.chats.length > 0) {
+            this.activeChat = this.chats[0];
+            this.historyCleared = false;
+          } else {
+            this.startNewChat();
+          }
+        }
+      }
+    });
   }
 
   clearAllChats() {
-    this.chatService.clearAllChats();
-    this.chats = [];
-    this.startNewChat();
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Clear All Chats',
+        message: 'This will delete all chats permanently. Continue?'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.chatService.clearAllChats();
+        this.chats = [];
+        this.startNewChat();
+      }
+    });
   }
 
   sendMessage() {
@@ -156,7 +181,7 @@ export class ChatComponent implements OnInit {
     this.activeChat.messages.push(botMessage);
     this.chatService.updateChat(this.activeChat);
 
-    this.botSubscription = this.chatService.sendMessage(this.activeChat, userMessage.text).subscribe({
+    this.botSubscription = this.chatService.sendMessage(this.activeChat, userMessage.text, this.selectedModel).subscribe({
       next: (chunk) => {
         botMessage.text += chunk;
         this.chatService.updateChat(this.activeChat);
@@ -197,7 +222,7 @@ export class ChatComponent implements OnInit {
     this.chatService.updateChat(this.activeChat);
 
     this.isLoading = true;
-    this.botSubscription = this.chatService.sendMessage(this.activeChat, this.lastUserMessage).subscribe({
+    this.botSubscription = this.chatService.sendMessage(this.activeChat, this.lastUserMessage, this.selectedModel).subscribe({
       next: (chunk) => {
         botMessage.text += chunk;
         this.chatService.updateChat(this.activeChat);

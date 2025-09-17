@@ -9,9 +9,10 @@
   <mat-form-field appearance="outline" class="model-select">
     <mat-label>Model</mat-label>
     <mat-select [(value)]="selectedModel">
-      <mat-option value="gemma:2b">gemma:2b</mat-option>
       <mat-option value="gemma3:270m">gemma3:270m</mat-option>
-    </mat-select>
+      <mat-option value="gemma:2b">gemma:2b</mat-option>
+      <mat-option value="llama3.2:latest">llama3.2:latest</mat-option>
+    </mat-select> 
   </mat-form-field>
 
   <h3>Chats History</h3>
