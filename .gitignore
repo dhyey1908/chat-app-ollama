@@ -6,3 +6,5 @@ package-lock.json
 .angular
 dist
 node_modules
+
+.env
