@@ -18,8 +18,9 @@ export class AppComponent {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        const hiddenRoutes = ['/login', '/signup', '/chat', '/confirm-user']; 
-        this.hideLayout = hiddenRoutes.includes(event.urlAfterRedirects);
+        const hiddenRoutes = ['/login', '/signup', '/chat', '/confirm-user'];
+        const currentRoute = event.urlAfterRedirects.split('?')[0];
+        this.hideLayout = hiddenRoutes.includes(currentRoute);
       });
   }
 }

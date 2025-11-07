@@ -34,16 +34,16 @@ export class LoginComponent {
 
     this.authService.loginUser(data).subscribe({
       next: (res) => {
+        localStorage.setItem('email',this.email);
         console.log('Login successful:', res);
         this.showSnackBar('Login Successful', 'Close');
         setTimeout(() => {
-          this.route.navigate(['/chat']);
+          this.route.navigate(['/']);
         }, 1000);
       },
       error: (err) => {
         console.error('Login failed:', err);
         this.showSnackBar('Login Failed', 'Close');
-
       }
     });
   }

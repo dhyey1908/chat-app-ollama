@@ -3,6 +3,30 @@
   <span class="spacer"></span>
   <a mat-button routerLink="/about">About</a>
   <a mat-button routerLink="/contact">Contact</a>
-  <button mat-stroked-button color="primary" routerLink="/login">Login</button>
-  <button mat-raised-button color="accent" routerLink="/signup">Sign Up</button>
+  <div *ngIf="userEmail; else showButtons">
+
+    <!-- User Profile Section -->
+    <div class="user-profile" [matMenuTriggerFor]="userMenu">
+      <div class="avatar">{{ userEmail.charAt(0).toUpperCase() || '' }}
+      </div>
+    </div>
+
+    <!-- Popup Menu -->
+    <mat-menu #userMenu="matMenu" class="profile-menu">
+      <div class="menu-content">
+        <p class="email">{{ userEmail }}</p>
+      </div>
+
+      <button mat-menu-item (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        Logout
+      </button>
+    </mat-menu>
+  </div>
+
+  <ng-template #showButtons>
+    <button mat-stroked-button color="primary" routerLink="/login">Login</button>
+    <button mat-raised-button color="accent" routerLink="/signup">Sign Up</button>
+  </ng-template>
+
 </mat-toolbar>

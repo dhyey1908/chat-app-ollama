@@ -12,6 +12,8 @@ import { ChatService } from '../../services/chat.service';
 import { Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
+import { Router } from '@angular/router';
 
 interface Message {
   from: 'user' | 'bot';
@@ -35,7 +37,8 @@ interface Chat {
     MatButtonModule,
     MatIconModule,
     MarkdownModule,
-    MatSelectModule
+    MatSelectModule,
+    MatMenuModule
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
@@ -50,7 +53,7 @@ export class ChatComponent implements OnInit {
   historyCleared = false;
   currentMessage = '';
   private botSubscription?: Subscription;
-
+  userEmail: string = '';
   // track last user message for "Try Again"
   lastUserMessage: string | null = null;
 
@@ -67,9 +70,11 @@ export class ChatComponent implements OnInit {
     'Let’s start the conversation 💬'
   ];
 
-  constructor(private chatService: ChatService, private dialog: MatDialog) { }
+  constructor(private chatService: ChatService, private dialog: MatDialog, private router: Router) { }
 
   ngOnInit() {
+    this.userEmail = localStorage.getItem('email') || 'User';
+
     this.chats = this.chatService.getChats();
     if (this.chats.length > 0) {
       this.activeChat = this.chats[0];
@@ -82,6 +87,10 @@ export class ChatComponent implements OnInit {
     this.sidebarOpen = !this.sidebarOpen;
   }
 
+  logout() {
+    localStorage.clear();
+    this.router.navigate(['/login']);
+  }
   startNewChat() {
     const existingEmptyChat = this.chats.find(chat => chat.messages.length === 0);
 
@@ -237,5 +246,9 @@ export class ChatComponent implements OnInit {
         this.chatService.updateChat(this.activeChat);
       }
     });
+  }
+
+  navigateToHome(){
+    this.router.navigate(['/']);
   }
 }

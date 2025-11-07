@@ -12,7 +12,7 @@
       <mat-option value="gemma3:270m">gemma3:270m</mat-option>
       <mat-option value="gemma:2b">gemma:2b</mat-option>
       <mat-option value="llama3.2:latest">llama3.2:latest</mat-option>
-    </mat-select> 
+    </mat-select>
   </mat-form-field>
 
   <h3>Chats History</h3>
@@ -22,7 +22,6 @@
   <div class="chat-list">
     <div class="chat-item" *ngFor="let chat of chats" [class.active]="chat.id === activeChat.id">
       <span class="chat-title" (click)="selectChat(chat)">{{ chat.title }}</span>
-
       <mat-icon color="warn" (click)="removeChat(chat, $event)">delete</mat-icon>
     </div>
   </div>
@@ -32,7 +31,25 @@
 <div class="chat-wrapper" [class.shift]="sidebarOpen">
   <div class="chat-container">
     <div class="chat-header">
-      <span class="logo" routerLink="/">🤖 Chatbot UI</span>
+      <span class="logo" (click)="navigateToHome()">🤖 Chatbot UI</span>
+
+      <!-- User Profile Section -->
+      <div class="user-profile" [matMenuTriggerFor]="userMenu">
+        <div class="avatar">{{ userEmail.charAt(0).toUpperCase() || '' }}
+        </div>
+      </div>
+
+      <!-- Popup Menu -->
+      <mat-menu #userMenu="matMenu" class="profile-menu">
+        <div class="menu-content">
+          <p class="email">{{ userEmail }}</p>
+        </div>
+
+        <button mat-menu-item (click)="logout()">
+          <mat-icon>logout</mat-icon>
+          Logout
+        </button>
+      </mat-menu>
     </div>
 
     <div class="chat-messages" #scrollMe>

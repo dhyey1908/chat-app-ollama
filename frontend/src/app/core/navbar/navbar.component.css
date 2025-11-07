@@ -21,3 +21,48 @@
     margin-right: 10px;
   }
 }
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  padding: 6px 10px;
+}
+
+.user-email {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
+  padding: 10px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  background: #1976d2;
+  color: #fff;
+  border-radius: 50%;
+  font-size: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+}
+
+.menu-content {
+  padding: 10px;
+}
+
+.profile-menu .menu-content {
+  text-align: center;
+  padding: 12px 20px 6px;
+}
+
+.profile-menu .email {
+  font-size: 14px;
+  color: #333;
+  margin-top: 8px;
+  font-weight: 500;
+  padding: 50px;
+}
