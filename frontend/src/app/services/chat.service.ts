@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { environment } from '../utils/envirnment';
 
 interface Message {
   from: 'user' | 'bot';
@@ -16,8 +17,6 @@ interface Chat {
   providedIn: 'root'
 })
 export class ChatService {
-  private apiUrl = 'http://localhost:5000/api/chat';
-
   // 🔹 Chat History Persistence
   private storageKey = 'chatHistory';
 
@@ -53,9 +52,9 @@ export class ChatService {
   }
 
 
-  sendMessage(chat: Chat, prompt: string, model:string): Observable<string> {
+  sendMessage(chat: Chat, prompt: string, model: string): Observable<string> {
     return new Observable<string>(observer => {
-      fetch(this.apiUrl, {
+      fetch(`${environment.apiUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

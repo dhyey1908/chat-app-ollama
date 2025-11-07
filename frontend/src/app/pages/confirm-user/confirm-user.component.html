@@ -1,0 +1,22 @@
+<form [formGroup]="otpForm">
+  <div class="auth-container">
+    <mat-card class="auth-card">
+      <div class="logo">UI</div>
+      <h2>Confirm OTP</h2>
+
+      <p>Please enter the OTP sent to your email.</p>
+
+      <mat-form-field appearance="outline" class="full-width"
+        [ngClass]="{'error-border': otpForm.get('otp')?.invalid && otpForm.get('otp')?.touched}">
+        <mat-label>OTP</mat-label>
+        <input matInput type="text" placeholder="Enter 6-digit OTP" formControlName="otp">
+        <mat-error *ngIf="otpForm.get('otp')?.hasError('required')">
+          OTP is required
+        </mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" class="full-width" (click)="confirmOtp()">Verify OTP</button>
+      <button mat-stroked-button class="full-width" routerLink="/signup">Back to Signup</button>
+    </mat-card>
+  </div>
+</form>

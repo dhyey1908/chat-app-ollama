@@ -5,6 +5,7 @@ import { LoginComponent } from './pages/login/login.component';
 import { SignupComponent } from './pages/signup/signup.component';
 import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
+import { ConfirmUserComponent } from './pages/confirm-user/confirm-user.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -13,4 +14,5 @@ export const routes: Routes = [
     { path: 'signup', component: SignupComponent },
     { path: 'about', component: AboutComponent },
     { path: 'contact', component: ContactComponent },
+    { path: 'confirm-user', component: ConfirmUserComponent }
 ];

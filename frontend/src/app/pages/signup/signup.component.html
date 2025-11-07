@@ -1,24 +1,43 @@
-<div class="auth-container">
-  <mat-card class="auth-card">
-    <div class="logo">UI</div>
-    <h2>Create Account</h2>
+<form [formGroup]="signupForm">
+  <div class="auth-container">
+    <mat-card class="auth-card">
+      <div class="logo">UI</div>
+      <h2>Create Account</h2>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Email</mat-label>
-      <input matInput type="email" placeholder="you@example.com" [(ngModel)]="email">
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width"
+        [ngClass]="{'error-border': signupForm.get('email')?.invalid && signupForm.get('email')?.touched}">
+        <mat-label>Email</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="you@example.com">
+        <mat-error *ngIf="signupForm.get('email')?.hasError('required')">Email is required</mat-error>
+        <mat-error *ngIf="signupForm.get('email')?.hasError('email')">Invalid email</mat-error>
+      </mat-form-field>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Password</mat-label>
-      <input matInput type="password" [(ngModel)]="password">
-    </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width"
+        [ngClass]="{'error-border': signupForm.get('password')?.invalid && signupForm.get('password')?.touched}">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" formControlName="password">
+        <mat-error *ngIf="signupForm.get('password')?.hasError('required') && signupForm.get('password')?.touched">
+          Password is required
+        </mat-error>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Confirm Password</mat-label>
-      <input matInput type="password" [(ngModel)]="confirmPassword">
-    </mat-form-field>
+        <mat-error *ngIf="signupForm.get('password')?.hasError('pattern') && signupForm.get('password')?.touched">
+         Use 8+ chars with upper, lower, number & symbol.
+        </mat-error>
 
-    <button mat-raised-button color="primary" class="full-width" (click)="signup()">Sign Up</button>
-    <button mat-stroked-button class="full-width" routerLink="/login">Back to Login</button>
-  </mat-card>
-</div>
+      </mat-form-field>
+
+
+
+
+      <mat-form-field appearance="outline" class="full-width"
+        [ngClass]="{'error-border': signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched}">
+        <mat-label>Confirm Password</mat-label>
+        <input matInput type="password" formControlName="confirmPassword">
+        <mat-error>Confirm Password is required</mat-error>
+      </mat-form-field>
+
+      <button mat-raised-button color="primary" class="full-width" (click)="signup()">Sign Up</button>
+      <button mat-stroked-button class="full-width" routerLink="/login">Back to Login</button>
+    </mat-card>
+  </div>
+</form>

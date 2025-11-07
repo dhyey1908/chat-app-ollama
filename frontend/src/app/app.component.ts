@@ -18,7 +18,7 @@ export class AppComponent {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe((event: any) => {
-        const hiddenRoutes = ['/login', '/signup', '/chat']; // add more if needed
+        const hiddenRoutes = ['/login', '/signup', '/chat', '/confirm-user']; 
         this.hideLayout = hiddenRoutes.includes(event.urlAfterRedirects);
       });
   }

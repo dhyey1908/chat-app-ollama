@@ -6,27 +6,53 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-login',
-  imports: [   CommonModule,
+  imports: [CommonModule,
     FormsModule,
     RouterModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule],
+    MatIconModule,
+    MatSnackBarModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css'
 })
 export class LoginComponent {
- email = '';
+  email = '';
   password = '';
 
+  constructor(private authService: AuthService, private snackBar: MatSnackBar, private route: Router) { }
   login() {
-    console.log('Login clicked:', this.email, this.password);
-    // TODO: Call API
+    const data = { email: this.email, password: this.password }
+
+    this.authService.loginUser(data).subscribe({
+      next: (res) => {
+        console.log('Login successful:', res);
+        this.showSnackBar('Login Successful', 'Close');
+        setTimeout(() => {
+          this.route.navigate(['/chat']);
+        }, 1000);
+      },
+      error: (err) => {
+        console.error('Login failed:', err);
+        this.showSnackBar('Login Failed', 'Close');
+
+      }
+    });
+  }
+
+  showSnackBar(message: string, action: string) {
+    this.snackBar.open(message, action, {
+      duration: 3000,
+      horizontalPosition: "right",
+      verticalPosition: "top"
+    });
   }
 }
