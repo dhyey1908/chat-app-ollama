@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-navbar',
@@ -16,14 +17,12 @@ import { MatMenuModule } from '@angular/material/menu';
 export class NavbarComponent {
   userEmail: string | null = null;
 
-  constructor(private router: Router) { }
+  constructor(private router: Router, private authService : AuthService) { }
   ngOnInit() {
     this.userEmail = localStorage.getItem('email');
   }
 
   logout() {
-    localStorage.removeItem('email');
-    this.userEmail = null;
-    this.router.navigate(['/login']);
+    this.authService.logout();
   }
 }

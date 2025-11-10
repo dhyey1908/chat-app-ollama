@@ -1,4 +1,4 @@
-const { signup, confirmUser, login } = require("../service/authService");
+const { signup, confirmUser, login, exchangeCodeForTokens } = require("../service/authService");
 
 const mapCognitoError = (err) => {
     if (!err || !err.code) return "Something went wrong. Please try again.";
@@ -57,5 +57,16 @@ exports.login = async (req, res) => {
     } catch (err) {
         console.error("Login Error:", err);
         res.status(401).json({ error: mapCognitoError(err) });
+    }
+};
+
+exports.googleToken = async (req, res) => {
+    try {
+        const { code } = req.body;
+        const tokens = await exchangeCodeForTokens(code);
+        res.json(tokens);
+    } catch (err) {
+        console.error("Google token exchange error:", err.response?.data || err);
+        res.status(500).json({ error: "Failed to exchange code" });
     }
 };

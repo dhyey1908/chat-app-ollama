@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../utils/envirnment';
 
@@ -18,7 +18,7 @@ interface otp {
 export class AuthService {
 
   constructor(private http: HttpClient) { }
-
+  
   signupUser(data: userData) {
     return this.http.post<userData>(`${environment.apiUrl}/signup`, data);
   }
@@ -30,5 +30,35 @@ export class AuthService {
 
   loginUser(data: userData) {
     return this.http.post<userData>(`${environment.apiUrl}/login`, data);
+  }
+
+  redirectToGoogle() {
+    const url =
+      `https://${environment.cognitoDomain}/oauth2/authorize` +
+      `?identity_provider=Google` +
+      `&response_type=code` +
+      `&client_id=${environment.cognitoClientId}` +
+      `&redirect_uri=${encodeURIComponent(environment.UiUrl + '/login')}` +
+      `&scope=${(environment.scope)}`;
+
+    console.log('Redirecting to:', url);
+    window.location.href = url;
+  }
+
+  handleGoogleCallback(code: string) {
+    return this.http.post<any>(`${environment.apiUrl}/google/token`, { code });
+  }
+
+  logout() {
+    localStorage.removeItem('email');
+    localStorage.removeItem('token');
+    sessionStorage.clear();
+
+    const logoutUrl =
+      `https://${environment.cognitoDomain}/logout` +
+      `?client_id=${environment.cognitoClientId}` +
+      `&logout_uri=${environment.UiUrl}/login`;
+
+    window.location.href = logoutUrl;
   }
 }
