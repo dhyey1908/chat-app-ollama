@@ -29,7 +29,7 @@ export class LoginComponent {
   password = '';
 
   constructor(private authService: AuthService, private snackBar: MatSnackBar,
-    private router: Router, private route: ActivatedRoute) { 
+    private router: Router, private route: ActivatedRoute) {
     this.route.queryParams.subscribe(params => {
       console.log('params: ', params);
       if (Object.keys(params).length === 0) {
@@ -60,7 +60,7 @@ export class LoginComponent {
       },
       error: (err) => {
         console.error('Login failed:', err);
-        this.showSnackBar('Login Failed', 'Close');
+        this.showSnackBar(err.error.error, 'Close');
       }
     });
   }
@@ -74,11 +74,9 @@ export class LoginComponent {
   }
 
   loginWithGoogle() {
-    console.log('Starting Google login process...');
     try {
       this.authService.redirectToGoogle();
       sessionStorage.setItem('googleAuthInProgress', 'true');
-      console.log('Redirecting to Google login...');
     } catch (error) {
       console.error('Failed to redirect to Google:', error);
       this.showSnackBar('Failed to start Google login', 'Close');
@@ -93,10 +91,9 @@ export class LoginComponent {
 
     this.authService.handleGoogleCallback(code).subscribe({
       next: (res: any) => {
-        console.log('Google login response received:', res);
-        if (res && res.AuthenticationResult && res.AuthenticationResult.AccessToken) {
+        if (res) {
           localStorage.setItem('email', res.email || 'google-user');
-          localStorage.setItem('token', res.AuthenticationResult.AccessToken);
+          localStorage.setItem('token', res.tokens.access_token);
           sessionStorage.removeItem('googleAuthInProgress');
           this.showSnackBar('Google Login Successful', 'Close');
           console.log('Google login successful, redirecting to home...');

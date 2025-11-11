@@ -61,4 +61,16 @@ export class AuthService {
 
     window.location.href = logoutUrl;
   }
+
+  forgotPassword(email: string) {
+    return this.http.post<any>(`${environment.apiUrl}/forgot-password`, { email });
+  }
+
+  confirmForgotPassword(email: string, code: string, newPassword: string) {
+    return this.http.post<any>(`${environment.apiUrl}/confirm-forgot-password`, {
+      email,
+      code,
+      newPassword
+    });
+  }
 }

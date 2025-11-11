@@ -6,6 +6,8 @@ import { SignupComponent } from './pages/signup/signup.component';
 import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { ConfirmUserComponent } from './pages/confirm-user/confirm-user.component';
+import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
@@ -14,5 +16,7 @@ export const routes: Routes = [
     { path: 'signup', component: SignupComponent },
     { path: 'about', component: AboutComponent },
     { path: 'contact', component: ContactComponent },
-    { path: 'confirm-user', component: ConfirmUserComponent }
+    { path: 'confirm-user', component: ConfirmUserComponent },
+    { path: 'forgot-password', component: ForgotPasswordComponent },
+    { path: 'reset-password', component: ResetPasswordComponent }
 ];

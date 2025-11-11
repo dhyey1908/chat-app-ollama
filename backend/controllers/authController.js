@@ -1,4 +1,4 @@
-const { signup, confirmUser, login, exchangeCodeForTokens } = require("../service/authService");
+const { signup, confirmUser, login, exchangeCodeForTokens, forgotPassword, confirmForgotPassword } = require("../service/authService");
 
 const mapCognitoError = (err) => {
     if (!err || !err.code) return "Something went wrong. Please try again.";
@@ -70,3 +70,26 @@ exports.googleToken = async (req, res) => {
         res.status(500).json({ error: "Failed to exchange code" });
     }
 };
+
+exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const result = await forgotPassword(email);
+        res.json(result);
+    } catch (err) {
+        console.error("Forgot Password Error:", err);
+        res.status(500).json({ error: "Forgot password not implemented yet" });
+    }
+};
+
+exports.confirmForgotPassword = async (req, res) => {
+    try {
+        const { email, code, newPassword } = req.body;
+        const result = await confirmForgotPassword(email, code, newPassword);
+        res.json(result);
+    } catch (err) {
+        console.error("Confirm Forgot Password Error:", err);
+        res.status(500).json({ error: "Confirm forgot password not implemented yet" });
+    }
+};
+

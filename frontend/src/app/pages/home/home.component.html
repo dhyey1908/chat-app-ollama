@@ -2,10 +2,20 @@
 
   <div class="hero-section">
     <h1>Chatbot UI</h1>
-    <p>Chat with AI instantly, just like ChatGPT.</p>
-    <button mat-raised-button color="primary" routerLink="/chat">
+
+    <p class="typing-text">
+      <span id="typing"></span>
+    </p>
+
+    <button mat-raised-button color="primary" [routerLink]="['/chat']" class="start-button">
       🚀 Start Chatting
     </button>
+
+    <div class="features">
+      <div class="feature-card">⚡ Instant Smart Replies</div>
+      <div class="feature-card">🔒 Secure Conversations</div>
+      <div class="feature-card">🌍 Multilingual AI Support</div>
+    </div>
   </div>
 
 </div>
