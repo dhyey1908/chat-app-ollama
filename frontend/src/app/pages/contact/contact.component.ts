@@ -5,6 +5,9 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { ContactService } from '../../services/contact.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-contact',
   imports: [CommonModule,
@@ -19,7 +22,7 @@ import { MatButtonModule } from '@angular/material/button';
 export class ContactComponent {
   contactForm: FormGroup;
 
-  constructor(private fb: FormBuilder) {
+  constructor(private fb: FormBuilder, private contactService: ContactService, private snackBar: MatSnackBar, private router: Router) {
     this.contactForm = this.fb.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
@@ -29,9 +32,23 @@ export class ContactComponent {
 
   onSubmit() {
     if (this.contactForm.valid) {
-      console.log('Form Data:', this.contactForm.value);
-      alert('Your message has been sent!');
-      this.contactForm.reset();
+      this.contactService.sendContactMessage(this.contactForm.value).subscribe({
+        next: () => {
+          this.showSnackBar('Message sent successfully!', 'Close');
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          this.showSnackBar(err.error.error || 'Message sending failed', 'Close');
+        }
+      });
     }
+  }
+
+  showSnackBar(message: string, action: string) {
+    this.snackBar.open(message, action, {
+      duration: 3000,
+      horizontalPosition: "right",
+      verticalPosition: "top"
+    });
   }
 }

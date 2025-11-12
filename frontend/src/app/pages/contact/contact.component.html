@@ -6,16 +6,20 @@
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Name</mat-label>
       <input matInput formControlName="name" placeholder="John Doe" />
+      <mat-error *ngIf="contactForm.get('name')?.hasError('required')">Name is required</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Email</mat-label>
       <input matInput formControlName="email" placeholder="you@example.com" />
+      <mat-error *ngIf="contactForm.get('email')?.hasError('required')">Email is required</mat-error>
+      <mat-error *ngIf="contactForm.get('email')?.hasError('email')">Invalid email</mat-error>
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Message</mat-label>
       <textarea matInput rows="4" formControlName="message"></textarea>
+      <mat-error *ngIf="contactForm.get('message')?.hasError('required')">Message is required</mat-error>
     </mat-form-field>
 
     <button mat-raised-button color="primary" type="submit" [disabled]="contactForm.invalid">
