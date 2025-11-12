@@ -1,12 +1,20 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-home',
-  imports: [ RouterModule],
+  imports: [RouterModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
 export class HomeComponent {
 
+  constructor(private router: Router) { }
+  handleNavigation() {
+    if (localStorage.getItem('token')) {
+      this.router.navigate(['/chat']);
+    } else {
+      this.router.navigate(['/login']);
+    }
+  }
 }

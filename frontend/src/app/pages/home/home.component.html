@@ -1,13 +1,13 @@
 <div class="landing-container">
 
   <div class="hero-section">
-    <h1>Chatbot UI</h1>
+    <h1>GenieChat</h1>
 
     <p class="typing-text">
       <span id="typing"></span>
     </p>
 
-    <button mat-raised-button color="primary" [routerLink]="['/chat']" class="start-button">
+    <button mat-raised-button color="primary" (click) = "handleNavigation()" class="start-button">
       🚀 Start Chatting
     </button>
 
