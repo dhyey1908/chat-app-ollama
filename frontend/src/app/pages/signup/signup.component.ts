@@ -71,7 +71,13 @@ export class SignupComponent {
     const email = this.signupForm.value.email;
 
     this.authService.signupUser(data).subscribe({
-      next: (res) => {
+      next: (res: any) => {
+        if (!res.success) {
+          const message = res.error || 'Failed to signup';
+          this.showSnackBar(message, 'Close');
+          return;
+        }
+
         this.showSnackBar("Signup Successful", "Close");
 
         setTimeout(() => {

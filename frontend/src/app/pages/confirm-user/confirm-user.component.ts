@@ -33,8 +33,8 @@ export class ConfirmUserComponent {
     });
 
     this.route.queryParams.subscribe(params => {
-    this.email = params['email'];
-  });
+      this.email = params['email'];
+    });
   }
 
   showSnackBar(message: string, action: string) {
@@ -57,7 +57,12 @@ export class ConfirmUserComponent {
     console.log('data: ', data);
 
     this.authService.confirmUserOtp(data).subscribe({
-      next: (res) => {
+      next: (res: any) => {
+        if (!res.success) {
+          const message = res.error || 'Failed to verify OTP';
+          this.showSnackBar(message, 'Close');
+          return;
+        }
         this.showSnackBar('OTP Verified Successfully', 'Close');
         setTimeout(() => {
           this.router.navigate(['/login']);

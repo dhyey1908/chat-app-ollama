@@ -31,7 +31,6 @@ export class LoginComponent {
   constructor(private authService: AuthService, private snackBar: MatSnackBar,
     private router: Router, private route: ActivatedRoute) {
     this.route.queryParams.subscribe(params => {
-      console.log('params: ', params);
       if (Object.keys(params).length === 0) {
         console.log('No params received, skipping Google callback');
         return;
@@ -51,8 +50,13 @@ export class LoginComponent {
 
     this.authService.loginUser(data).subscribe({
       next: (res: any) => {
+         if (!res.success) {
+          const message = res.error || 'Failed to login';
+          this.showSnackBar(message, 'Close');
+          return;
+        }
         localStorage.setItem('email', this.email);
-        localStorage.setItem('token', res.AuthenticationResult.AccessToken);
+        localStorage.setItem('token', res.data.AuthenticationResult.AccessToken);
         this.showSnackBar('Login Successful', 'Close');
         setTimeout(() => {
           this.router.navigate(['/']);
