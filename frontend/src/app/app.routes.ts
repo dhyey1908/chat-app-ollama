@@ -8,10 +8,11 @@ import { ContactComponent } from './pages/contact/contact.component';
 import { ConfirmUserComponent } from './pages/confirm-user/confirm-user.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { AuthGuard } from './services/auth.guard';
 
 export const routes: Routes = [
     { path: '', component: HomeComponent },
-    { path: 'chat', component: ChatComponent },
+    { path: 'chat', component: ChatComponent, canActivate: [AuthGuard] },
     { path: 'login', component: LoginComponent },
     { path: 'signup', component: SignupComponent },
     { path: 'about', component: AboutComponent },

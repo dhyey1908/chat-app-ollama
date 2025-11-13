@@ -10,6 +10,8 @@ const {
     ConfirmForgotPasswordCommand
 } = require("@aws-sdk/client-cognito-identity-provider");
 
+const db = require("../db/connection");
+
 AWS.config.update({ region: process.env.COGNITO_REGION });
 const cognito = new AWS.CognitoIdentityServiceProvider();
 
@@ -18,50 +20,105 @@ const client = new CognitoIdentityProviderClient({
 });
 
 function generateSecretHash(username) {
-    return crypto
-        .createHmac("SHA256", process.env.COGNITO_CLIENT_SECRET)
-        .update(username + process.env.COGNITO_CLIENT_ID)
-        .digest("base64");
+    try {
+        return crypto
+            .createHmac("SHA256", process.env.COGNITO_CLIENT_SECRET)
+            .update(username + process.env.COGNITO_CLIENT_ID)
+            .digest("base64");
+    } catch (err) {
+        console.error("Secret hash generation failed:", err);
+        throw new Error("Internal error generating secret hash");
+    }
 }
 
 exports.signup = async (email, password) => {
-    const params = {
-        ClientId: process.env.COGNITO_CLIENT_ID,
-        Username: email,
-        Password: password,
-        UserAttributes: [{ Name: "email", Value: email }],
-        SecretHash: generateSecretHash(email),
-    };
-    return cognito.signUp(params).promise();
+    try {
+        const params = {
+            ClientId: process.env.COGNITO_CLIENT_ID,
+            Username: email,
+            Password: password,
+            UserAttributes: [{ Name: "email", Value: email }],
+            SecretHash: generateSecretHash(email),
+        };
+        const response = await cognito.signUp(params).promise();
+        return {
+            success: true,
+            data: response,
+        };
+    } catch (error) {
+        console.error("Signup Service Error:", error);
+        return {
+            success: false,
+            error: error?.message || error || "Signup failed",
+        };
+    }
 };
 
 exports.confirmUser = async (email, code) => {
-    const params = {
-        ClientId: process.env.COGNITO_CLIENT_ID,
-        Username: email,
-        ConfirmationCode: code,
-        SecretHash: generateSecretHash(email),
-    };
-    return cognito.confirmSignUp(params).promise();
+    try {
+        const params = {
+            ClientId: process.env.COGNITO_CLIENT_ID,
+            Username: email,
+            ConfirmationCode: code,
+            SecretHash: generateSecretHash(email),
+        };
+
+        await cognito.confirmSignUp(params).promise();
+
+        const [existingUser] = await db
+            .promise()
+            .query("SELECT id FROM users WHERE email = ?", [email]);
+
+        if (existingUser.length === 0) {
+            await db
+                .promise()
+                .query(
+                    "INSERT INTO users (email, created_at) VALUES (?, NOW())",
+                    [email]
+                );
+        }
+
+        return {
+            success: true,
+            message: "User confirmed and added to database successfully!",
+        };
+    } catch (error) {
+        console.error("Confirm User Error:", error);
+        return {
+            success: false,
+            error: error.message || "Failed to confirm user",
+        };
+    }
 };
 
 exports.login = async (email, password) => {
-    const params = {
-        AuthFlow: "USER_PASSWORD_AUTH",
-        ClientId: process.env.COGNITO_CLIENT_ID,
-        AuthParameters: {
-            USERNAME: email,
-            PASSWORD: password,
-            SECRET_HASH: generateSecretHash(email),
-        },
-    };
-    return cognito.initiateAuth(params).promise();
+    try {
+        const params = {
+            AuthFlow: "USER_PASSWORD_AUTH",
+            ClientId: process.env.COGNITO_CLIENT_ID,
+            AuthParameters: {
+                USERNAME: email,
+                PASSWORD: password,
+                SECRET_HASH: generateSecretHash(email),
+            },
+        };
+        const response = await cognito.initiateAuth(params).promise();
+        return {
+            success: true,
+            data: response,
+        };
+    } catch (error) {
+        console.error("Login Service Error:", error);
+        return {
+            success: false,
+            error: error?.message || error || "Login failed",
+        };
+    }
 };
 
 exports.exchangeCodeForTokens = async (code) => {
     try {
         process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
-
         const tokenUrl = `https://${process.env.COGNITO_DOMAIN}/oauth2/token`;
 
         const requestBody = qs.stringify({
@@ -95,7 +152,7 @@ exports.exchangeCodeForTokens = async (code) => {
         console.error("Token exchange failed:", error.response?.data || error.message);
         return {
             success: false,
-            error: error.response?.data || error.message,
+            error: error.response?.data || error.message || "Failed to exchange token",
         };
     }
 };
@@ -122,7 +179,7 @@ exports.refreshTokens = async (refreshToken) => {
         console.error("Token refresh failed:", error.response?.data || error.message);
         return {
             success: false,
-            error: error.response?.data || error.message,
+            error: error.response?.data || error.message || "Failed to refresh token",
         };
     }
 };
@@ -143,9 +200,10 @@ exports.forgotPassword = async (email) => {
             data: response
         };
     } catch (error) {
+        console.error("Forgot Password Error:", error);
         return {
             success: false,
-            error: error.message || error
+            error: error.message || "Failed to initiate forgot password",
         };
     }
 };
@@ -167,9 +225,10 @@ exports.confirmForgotPassword = async (email, code, newPassword) => {
             message: "Password reset successful"
         };
     } catch (error) {
+        console.error("Confirm Forgot Password Error:", error);
         return {
             success: false,
-            error: error.message || error
+            error: error.message || "Failed to confirm forgot password",
         };
     }
 };

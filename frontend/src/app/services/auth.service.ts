@@ -24,7 +24,6 @@ export class AuthService {
   }
 
   confirmUserOtp(data: otp) {
-    console.log('data: ', data);
     return this.http.post<otp>(`${environment.apiUrl}/confirmUser`, data);
   }
 
