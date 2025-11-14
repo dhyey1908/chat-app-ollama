@@ -8,6 +8,10 @@ exports.signup = async (req, res) => {
     try {
         const { email, password } = req.body;
         const result = await signup(email, password);
+        if (!result || result.success === false) {
+            console.error('signup service returned error:', result && result.error);
+            return res.status(500).json({ error: result?.error || 'Signup failed' });
+        }
         res.json(result);
     } catch (err) {
         console.error("Signup Error:", err);
@@ -22,6 +26,10 @@ exports.confirmUser = async (req, res) => {
     try {
         const { email, code } = req.body;
         const result = await confirmUser(email, code);
+        if (!result || result.success === false) {
+            console.error('confirmUser service returned error:', result && result.error);
+            return res.status(500).json({ error: result?.error || 'User confirmation failed' });
+        }
         res.json(result);
     } catch (err) {
         console.error("Confirm Error:", err);
@@ -35,8 +43,12 @@ exports.login = async (req, res) => {
     }
     try {
         const { email, password } = req.body;
-        const token = await login(email, password);
-        res.json(token);
+        const result = await login(email, password);
+        if (!result || result.success === false) {
+            console.error('login service returned error:', result && result.error);
+            return res.status(500).json({ error: result?.error || 'Login failed' });
+        }
+        res.json(result);
     } catch (err) {
         console.error("Login Error:", err);
         res.status(401).json({ error: mapCognitoError(err) });
@@ -49,8 +61,12 @@ exports.googleToken = async (req, res) => {
     }
     try {
         const { code } = req.body;
-        const tokens = await exchangeCodeForTokens(code);
-        res.json(tokens);
+        const result = await exchangeCodeForTokens(code);
+        if (!result || result.success === false) {
+            console.error('exchangeCodeForTokens service returned error:', result && result.error);
+            return res.status(500).json({ error: result?.error || 'Failed to exchange authorization code' });
+        }
+        res.json(result);
     } catch (err) {
         console.error("Google token exchange error:", err.response?.data || err);
         res.status(500).json({ error: "Failed to exchange authorization code" });
@@ -64,6 +80,10 @@ exports.forgotPassword = async (req, res) => {
     try {
         const { email } = req.body;
         const result = await forgotPassword(email);
+        if (!result || result.success === false) {
+            console.error('forgotPassword service returned error:', result && result.error);
+            return res.status(500).json({ error: result?.error || 'Failed to initiate forgot password' });
+        }
         res.json(result);
     } catch (err) {
         console.error("Forgot Password Error:", err);
@@ -78,6 +98,10 @@ exports.confirmForgotPassword = async (req, res) => {
     try {
         const { email, code, newPassword } = req.body;
         const result = await confirmForgotPassword(email, code, newPassword);
+        if (!result || result.success === false) {
+            console.error('confirmForgotPassword service returned error:', result && result.error);
+            return res.status(500).json({ error: result?.error || 'Failed to confirm password reset' });
+        }
         res.json(result);
     } catch (err) {
         console.error("Confirm Forgot Password Error:", err);

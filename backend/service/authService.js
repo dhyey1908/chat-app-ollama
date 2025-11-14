@@ -65,22 +65,33 @@ exports.confirmUser = async (email, code) => {
 
         await cognito.confirmSignUp(params).promise();
 
-        const [existingUser] = await db
-            .promise()
-            .query("SELECT id FROM users WHERE email = ?", [email]);
+        const [existing] = await db.query(
+            "SELECT * FROM users WHERE email = ?",
+            [email]
+        );
 
-        if (existingUser.length === 0) {
-            await db
-                .promise()
-                .query(
-                    "INSERT INTO users (email, created_at) VALUES (?, NOW())",
-                    [email]
-                );
+        if (existing.length > 0) {
+            return {
+                success: true,
+                message: "User already exists in database.",
+                user: existing[0],
+            };
         }
+
+        await db.query(
+            "INSERT INTO users (id, email, created_at) VALUES (UUID(), ?, NOW())",
+            [email]
+        );
+
+        const [newUser] = await db.query(
+            "SELECT * FROM users WHERE email = ?",
+            [email]
+        );
 
         return {
             success: true,
             message: "User confirmed and added to database successfully!",
+            user: newUser[0],
         };
     } catch (error) {
         console.error("Confirm User Error:", error);

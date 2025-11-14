@@ -58,7 +58,7 @@
         <p>{{ currentMessage }}</p>
       </div>
 
-      <div *ngFor="let msg of activeChat.messages; let i = index">
+      <div *ngFor="let msg of activeChat?.messages; let i = index">
         <div class="message" [ngClass]="msg.from">
           <mat-card>
             <p *ngIf="msg.from === 'user'">{{ msg.text }}</p>
@@ -66,12 +66,13 @@
             <div *ngIf="msg.from === 'bot' && !msg.text && isLoading" class="dot-loader"></div>
           </mat-card>
         </div>
-        <div *ngIf="msg.from === 'bot' && i === activeChat.messages.length - 1 && !isLoading && lastUserMessage"
+        <!-- <div
+          *ngIf="msg.from === 'bot' && activeChat?.messages && i === activeChat.messages.length - 1 && !isLoading && lastUserMessage"
           class="try-again">
           <span color="primary" (click)="tryAgain()">
             <mat-icon>loop</mat-icon>
           </span>
-        </div>
+        </div> -->
       </div>
     </div>
 

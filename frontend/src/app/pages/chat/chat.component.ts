@@ -14,17 +14,7 @@ import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dial
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router } from '@angular/router';
-
-interface Message {
-  from: 'user' | 'bot';
-  text: string;
-}
-
-interface Chat {
-  id: string;
-  title: string;
-  messages: Message[];
-}
+import { Chat, Message } from '../../services/chat.service';
 
 @Component({
   selector: 'app-chat',
@@ -54,7 +44,6 @@ export class ChatComponent implements OnInit {
   currentMessage = '';
   private botSubscription?: Subscription;
   userEmail: string = '';
-  // track last user message for "Try Again"
   lastUserMessage: string | null = null;
 
   greetings = [
@@ -70,17 +59,23 @@ export class ChatComponent implements OnInit {
     'Let’s start the conversation 💬'
   ];
 
-  constructor(private chatService: ChatService, private dialog: MatDialog, private router: Router) { }
+  constructor(private chatService: ChatService, private dialog: MatDialog, private router: Router) {
+  }
 
   ngOnInit() {
     this.userEmail = localStorage.getItem('email') || 'User';
 
-    this.chats = this.chatService.getChats();
-    if (this.chats.length > 0) {
-      this.activeChat = this.chats[0];
-    } else {
-      this.startNewChat();
-    }
+    this.chatService.getAllSessions().subscribe({
+      next: (sessions) => {
+        this.chats = sessions;
+        if (this.chats.length > 0) {
+          this.selectChat(this.chats[0]);
+        } else {
+          this.startNewChat();
+        }
+      },
+      error: (err) => console.error('Failed to load chats:', err)
+    });
   }
 
   toggleSidebar() {
@@ -91,19 +86,26 @@ export class ChatComponent implements OnInit {
     localStorage.clear();
     this.router.navigate(['/login']);
   }
+
   startNewChat() {
-    const existingEmptyChat = this.chats.find(chat => chat.messages.length === 0);
+    const existingEmptyChat = this.chats.find(chat => chat.messages && chat.messages.length === 0);
 
     if (existingEmptyChat) {
       this.activeChat = existingEmptyChat;
       this.historyCleared = true;
       this.currentMessage = this.getRandomGreeting();
     } else {
-      const chat = this.chatService.createChat('New Chat');
-      this.chats = this.chatService.getChats();
-      this.activeChat = chat;
-      this.historyCleared = true;
-      this.currentMessage = this.getRandomGreeting();
+      this.chatService.createChat('New Chat').subscribe({
+        next: (res) => {
+          this.chatService.getAllSessions().subscribe((sessions) => {
+            this.chats = sessions;
+            this.activeChat = sessions[0];
+            this.historyCleared = true;
+            this.currentMessage = this.getRandomGreeting();
+          });
+        },
+        error: (err) => console.error('Failed to create chat:', err)
+      });
     }
   }
 
@@ -114,12 +116,18 @@ export class ChatComponent implements OnInit {
 
   selectChat(chat: Chat) {
     this.activeChat = chat;
-    if (chat.messages.length === 0) {
-      this.historyCleared = true;
-      this.currentMessage = this.getRandomGreeting();
-    } else {
-      this.historyCleared = false;
-    }
+    this.chatService.getSessionMessages(chat.id).subscribe({
+      next: (messages) => {
+        this.activeChat.messages = messages;
+        if (messages.length === 0) {
+          this.historyCleared = true;
+          this.currentMessage = this.getRandomGreeting();
+        } else {
+          this.historyCleared = false;
+        }
+      },
+      error: (err) => console.error('Failed to load messages:', err)
+    });
   }
 
   removeChat(chat: Chat, event: Event) {
@@ -134,75 +142,73 @@ export class ChatComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.chatService.removeChat(chat.id);
-        this.chats = this.chatService.getChats();
-
-        if (this.activeChat?.id === chat.id) {
-          if (this.chats.length > 0) {
-            this.activeChat = this.chats[0];
-            this.historyCleared = false;
-          } else {
-            this.startNewChat();
-          }
-        }
+        this.chatService.deleteChat(chat.id).subscribe({
+          next: () => {
+            this.chatService.getAllSessions().subscribe(sessions => {
+              this.chats = sessions;
+              if (this.chats.length > 0) {
+                this.activeChat = this.chats[0];
+                this.historyCleared = false;
+              } else {
+                this.startNewChat();
+              }
+            });
+          },
+          error: (err) => console.error('Failed to delete chat:', err)
+        });
       }
     });
   }
 
   clearAllChats() {
     const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      data: {
-        title: 'Clear All Chats',
-        message: 'This will delete all chats permanently. Continue?'
-      }
+      data: { title: 'Clear All Chats', message: 'This will delete all chats permanently. Continue?' }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.chatService.clearAllChats();
-        this.chats = [];
-        this.startNewChat();
+        this.chatService.clearAllChats().subscribe({
+          next: () => {
+            this.chats = [];
+            this.startNewChat();
+          },
+          error: (err) => console.error('Failed to clear chats:', err)
+        });
       }
     });
   }
 
   sendMessage() {
     if (!this.userInput.trim() || this.isLoading) return;
-
+    if (!this.activeChat) return;
     const userMessage: Message = { from: 'user', text: this.userInput };
+    this.activeChat.messages = this.activeChat.messages || [];
     this.activeChat.messages.push(userMessage);
 
-    // store last user input for "try again"
     this.lastUserMessage = this.userInput;
 
     if (this.activeChat.messages.length === 1) {
-      this.activeChat.title = userMessage.text.length > 20
-        ? userMessage.text.slice(0, 20) + '...'
-        : userMessage.text;
+      this.activeChat.title = userMessage.text.length > 20 ? userMessage.text.slice(0, 20) + '...' : userMessage.text;
     }
 
-    this.chatService.updateChat(this.activeChat);
+    // Save user message to DB
+    this.chatService.saveMessage(this.activeChat.id, 'user', userMessage.text).subscribe();
 
     this.userInput = '';
     this.isLoading = true;
 
     const botMessage: Message = { from: 'bot', text: '' };
     this.activeChat.messages.push(botMessage);
-    this.chatService.updateChat(this.activeChat);
 
     this.botSubscription = this.chatService.sendMessage(this.activeChat, userMessage.text, this.selectedModel).subscribe({
-      next: (chunk) => {
-        botMessage.text += chunk;
-        this.chatService.updateChat(this.activeChat);
-      },
+      next: (chunk) => (botMessage.text += chunk),
       error: () => {
         botMessage.text += '\n⚠️ Error: could not reach server.';
         this.isLoading = false;
-        this.chatService.updateChat(this.activeChat);
       },
       complete: () => {
         this.isLoading = false;
-        this.chatService.updateChat(this.activeChat);
+        this.chatService.saveMessage(this.activeChat.id, 'bot', botMessage.text).subscribe();
       }
     });
 
@@ -218,9 +224,8 @@ export class ChatComponent implements OnInit {
   }
 
   tryAgain() {
-    if (!this.lastUserMessage || this.isLoading) return;
+    if (!this.lastUserMessage || this.isLoading || !this.activeChat?.messages) return; // ✅ safe check
 
-    // remove last bot message
     const lastBotIndex = this.activeChat.messages.map(m => m.from).lastIndexOf('bot');
     if (lastBotIndex !== -1) {
       this.activeChat.messages.splice(lastBotIndex, 1);
@@ -228,27 +233,22 @@ export class ChatComponent implements OnInit {
 
     const botMessage: Message = { from: 'bot', text: '' };
     this.activeChat.messages.push(botMessage);
-    this.chatService.updateChat(this.activeChat);
 
     this.isLoading = true;
     this.botSubscription = this.chatService.sendMessage(this.activeChat, this.lastUserMessage, this.selectedModel).subscribe({
-      next: (chunk) => {
-        botMessage.text += chunk;
-        this.chatService.updateChat(this.activeChat);
-      },
+      next: (chunk) => (botMessage.text += chunk),
       error: () => {
         botMessage.text += '\n⚠️ Error: could not reach server.';
         this.isLoading = false;
-        this.chatService.updateChat(this.activeChat);
       },
       complete: () => {
         this.isLoading = false;
-        this.chatService.updateChat(this.activeChat);
+        this.chatService.saveMessage(this.activeChat.id, 'bot', botMessage.text).subscribe();
       }
     });
   }
 
-  navigateToHome(){
+  navigateToHome() {
     this.router.navigate(['/']);
   }
 }

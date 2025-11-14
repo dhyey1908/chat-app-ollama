@@ -50,13 +50,25 @@ export class LoginComponent {
 
     this.authService.loginUser(data).subscribe({
       next: (res: any) => {
-         if (!res.success) {
+        if (!res.success) {
           const message = res.error || 'Failed to login';
           this.showSnackBar(message, 'Close');
           return;
         }
         localStorage.setItem('email', this.email);
         localStorage.setItem('token', res.data.AuthenticationResult.AccessToken);
+        this.authService.getUserId(this.email).subscribe({
+          next: (res: any) => {
+            if (res && res.userId) {
+              localStorage.setItem('userId', res.userId);
+            } else {
+              console.error('Invalid userId response:', res);
+            }
+          },
+          error: (err) => {
+            console.error('Failed to fetch userId:', err);
+          }
+        });
         this.showSnackBar('Login Successful', 'Close');
         setTimeout(() => {
           this.router.navigate(['/']);

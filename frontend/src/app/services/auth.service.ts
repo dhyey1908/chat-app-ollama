@@ -18,7 +18,11 @@ interface otp {
 export class AuthService {
 
   constructor(private http: HttpClient) { }
-  
+
+  getUserId(email: string) {
+    return this.http.get<{ userId: string }>(`${environment.apiUrl}/userId?email=${email}`);
+  }
+
   signupUser(data: userData) {
     return this.http.post<userData>(`${environment.apiUrl}/signup`, data);
   }

@@ -11,7 +11,7 @@ export class HomeComponent {
 
   constructor(private router: Router) { }
   handleNavigation() {
-    if (localStorage.getItem('token')) {
+    if (localStorage.getItem('userId')) {
       this.router.navigate(['/chat']);
     } else {
       this.router.navigate(['/login']);

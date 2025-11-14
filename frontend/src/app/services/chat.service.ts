@@ -1,91 +1,92 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../utils/envirnment';
 
-interface Message {
+export interface Message {
   from: 'user' | 'bot';
   text: string;
+  timestamp?: string;
 }
 
-interface Chat {
+export interface Chat {
   id: string;
   title: string;
-  messages: Message[];
+  messages?: Message[];
+  created_at?: string;
 }
 
 @Injectable({
   providedIn: 'root'
 })
 export class ChatService {
-  // 🔹 Chat History Persistence
-  private storageKey = 'chatHistory';
+  private apiUrl = environment.apiUrl;
+  private userIdKey = 'userId';
 
-  getChats(): Chat[] {
-    const data = localStorage.getItem(this.storageKey);
-    return data ? JSON.parse(data) : [];
+  constructor(private http: HttpClient) { }
+
+  getAllSessions(): Observable<Chat[]> {
+    const userId = localStorage.getItem(this.userIdKey);
+    return this.http.get<Chat[]>(`${this.apiUrl}/sessions?userId=${userId}`);
   }
 
-  saveChats(chats: Chat[]) {
-    localStorage.setItem(this.storageKey, JSON.stringify(chats));
+  createChat(title: string = 'New Chat'): Observable<any> {
+    const userId = localStorage.getItem(this.userIdKey);
+    return this.http.post(`${this.apiUrl}/sync-chats`, { userId, title });
   }
 
-  createChat(title: string = 'New Chat'): Chat {
-    const chat: Chat = { id: Date.now().toString(), title, messages: [] };
-    const chats = this.getChats();
-    chats.push(chat);
-    this.saveChats(chats);
-    return chat;
-  }
-  
-  updateChat(chat: Chat) {
-    const chats = this.getChats().map(c => c.id === chat.id ? chat : c);
-    this.saveChats(chats);
+  getSessionMessages(sessionId: string): Observable<Message[]> {
+    return this.http.get<Message[]>(`${this.apiUrl}/messages?sessionId=${sessionId}`);
   }
 
-  removeChat(chatId: string) {
-    const chats = this.getChats().filter(c => c.id !== chatId);
-    this.saveChats(chats);
+  saveMessage(sessionId: string, from: 'user' | 'bot', text: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/messages`, { sessionId, sender: from, text });
   }
 
-  clearAllChats() {
-    localStorage.removeItem(this.storageKey);
+  deleteChat(sessionId: string): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/session/${sessionId}`);
   }
 
+  clearAllChats(): Observable<any> {
+    const userId = localStorage.getItem(this.userIdKey);
+    return this.http.delete(`${this.apiUrl}/clear/${userId}`);
+  }
 
   sendMessage(chat: Chat, prompt: string, model: string): Observable<string> {
     return new Observable<string>(observer => {
-      fetch(`${environment.apiUrl}/chat`, {
+      fetch(`${this.apiUrl}/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: model,
-          messages: chat.messages // 🔹 full history
+          messages: chat.messages
         })
-      }).then(async res => {
-        if (!res.body) throw new Error('No response body');
+      })
+        .then(async res => {
+          if (!res.body) throw new Error('No response body');
+          const reader = res.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+          let done = false;
 
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder('utf-8');
-        let done = false;
-
-        while (!done) {
-          const { value, done: readerDone } = await reader.read();
-          done = readerDone;
-          if (value) {
-            const chunk = decoder.decode(value);
-            const lines = chunk.split('\n').filter(l => l.trim() !== '');
-            for (const line of lines) {
-              try {
-                const obj = JSON.parse(line);
-                if (obj.content) observer.next(obj.content);
-              } catch {
-                console.error('Failed to parse chunk:', line);
+          while (!done) {
+            const { value, done: readerDone } = await reader.read();
+            done = readerDone;
+            if (value) {
+              const chunk = decoder.decode(value);
+              const lines = chunk.split('\n').filter(l => l.trim() !== '');
+              for (const line of lines) {
+                try {
+                  const obj = JSON.parse(line);
+                  if (obj.content) observer.next(obj.content);
+                } catch {
+                  console.error('Failed to parse chunk:', line);
+                }
               }
             }
           }
-        }
-        observer.complete();
-      }).catch(err => observer.error(err));
+          observer.complete();
+        })
+        .catch(err => observer.error(err));
     });
   }
 }
