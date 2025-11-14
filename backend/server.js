@@ -4,11 +4,17 @@ const chatRoutes = require("./routes/chatRoutes");
 const authRoutes = require("./routes/authRoutes");
 const contactRoutes = require("./routes/contactRoutes");
 const { verifyToken } = require("./middleware/verifyToken");
-
+const cookieParser = require('cookie-parser');
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:4200",
+  methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
+  credentials: true,
+}));
+
+app.use(cookieParser());
 app.use(express.json());
 
 app.use((req, res, next) => {

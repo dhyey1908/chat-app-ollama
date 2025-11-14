@@ -15,6 +15,7 @@
     "@aws-sdk/client-ses": "^3.929.0",
     "aws-sdk": "^2.1692.0",
     "axios": "^1.13.2",
+    "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "dotenv": "^17.2.3",

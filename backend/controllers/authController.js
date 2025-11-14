@@ -48,6 +48,20 @@ exports.login = async (req, res) => {
             console.error('login service returned error:', result && result.error);
             return res.status(500).json({ error: result?.error || 'Login failed' });
         }
+        const accessToken = result.data?.AuthenticationResult?.AccessToken;
+
+        if (accessToken) {
+            res.cookie('access_token', accessToken, {
+                httpOnly: true,
+                secure: false,
+                sameSite: 'lax',
+                path: '/',
+                maxAge: 60 * 60 * 1000,
+            });
+        } else {
+            console.warn('Login succeeded but no access token present in authentication result', result);
+        }
+
         res.json(result);
     } catch (err) {
         console.error("Login Error:", err);

@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../utils/envirnment';
 
@@ -23,55 +23,48 @@ export class ChatService {
   private apiUrl = environment.apiUrl;
   private userIdKey = 'userId';
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  private getAuthHttpOptions(): { headers: HttpHeaders } {
-    const token = localStorage.getItem('token');
-    let headers = new HttpHeaders();
-    if (token) {
-      headers = headers.set('Authorization', `Bearer ${token}`);
-    }
-    return { headers };
+  /**
+   * Reusable HTTP options that send cookies with every request.
+   */
+  private getHttpOptions() {
+    return { withCredentials: true };
   }
 
   getAllSessions(): Observable<Chat[]> {
     const userId = localStorage.getItem(this.userIdKey);
-    return this.http.get<Chat[]>(`${this.apiUrl}/chat/sessions?userId=${userId}`, this.getAuthHttpOptions());
+    return this.http.get<Chat[]>(`${this.apiUrl}/chat/sessions?userId=${userId}`, this.getHttpOptions());
   }
 
   createChat(title: string = 'New Chat'): Observable<any> {
     const userId = localStorage.getItem(this.userIdKey);
-    return this.http.post(`${this.apiUrl}/chat/sync-chats`, { userId, title }, this.getAuthHttpOptions());
+    return this.http.post(`${this.apiUrl}/chat/sync-chats`, { userId, title }, this.getHttpOptions());
   }
 
   getSessionMessages(sessionId: string): Observable<Message[]> {
-    return this.http.get<Message[]>(`${this.apiUrl}/chat/messages?sessionId=${sessionId}`, this.getAuthHttpOptions());
+    return this.http.get<Message[]>(`${this.apiUrl}/chat/messages?sessionId=${sessionId}`, this.getHttpOptions());
   }
 
   saveMessage(sessionId: string, from: 'user' | 'bot', text: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/chat/messages`, { sessionId, sender: from, text }, this.getAuthHttpOptions());
+    return this.http.post(`${this.apiUrl}/chat/messages`, { sessionId, sender: from, text }, this.getHttpOptions());
   }
 
   deleteChat(sessionId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/chat/session/${sessionId}`, this.getAuthHttpOptions());
+    return this.http.delete(`${this.apiUrl}/chat/session/${sessionId}`, this.getHttpOptions());
   }
 
   clearAllChats(): Observable<any> {
     const userId = localStorage.getItem(this.userIdKey);
-    return this.http.delete(`${this.apiUrl}/chat/clear/${userId}`, this.getAuthHttpOptions());
+    return this.http.delete(`${this.apiUrl}/chat/clear/${userId}`, this.getHttpOptions());
   }
 
   sendMessage(chat: Chat, prompt: string, model: string): Observable<string> {
-    const token = localStorage.getItem('token');
-    const fetchHeaders: Record<string, string> = {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {})
-    };
-
     return new Observable<string>(observer => {
       fetch(`${this.apiUrl}/chat/model`, {
         method: 'POST',
-        headers: fetchHeaders,
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', 
         body: JSON.stringify({
           model: model,
           messages: chat.messages
