@@ -1,5 +1,5 @@
 const http = require('http');
-const { getSessionMessages, getUserSessions, addMessage, clearAllChats, createChat, deleteChat, getUserId } = require('../service/chatService');
+const { getSessionMessages, getUserSessions, addMessage, clearAllChats, createChat, deleteChat } = require('../service/chatService');
 
 exports.chatWithModel = async (req, res) => {
   const { model, messages, temperature, max_tokens } = req.body;
@@ -154,17 +154,3 @@ exports.clearAllChats = async (req, res) => {
   }
 };
 
-exports.getUserId = async (req, res) => {
-  try {
-    const { email } = req.query;
-    const result = await getUserId(email);
-    if (!result || !result.success) {
-      console.error('getUserId service returned error:', result && result.error);
-      return res.status(500).json({ error: result?.error || 'Failed to get user ID' });
-    }
-    res.json({ userId: result.data });
-  } catch (err) {
-    console.error('getUserId error:', err);
-    res.status(500).json({ error: 'Failed to get user ID' });
-  }
-};

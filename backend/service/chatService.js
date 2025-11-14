@@ -83,13 +83,4 @@ exports.clearAllChats = async (userId) => {
     }
 };
 
-exports.getUserId = async (email) => {
-    try {
-        const [rows] = await db.query('SELECT id FROM users WHERE email = ?', [email]);
-        const id = rows.length > 0 ? rows[0].id : null;
-        return { success: true, data: id };
-    } catch (error) {
-        console.error('getUserId Service Error:', error);
-        return { success: false, error: error?.message || 'Failed to get user id' };
-    }
-};
+

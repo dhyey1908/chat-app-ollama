@@ -1,4 +1,4 @@
-const { signup, confirmUser, login, exchangeCodeForTokens, forgotPassword, confirmForgotPassword } = require("../service/authService");
+const { signup, confirmUser, login, exchangeCodeForTokens, forgotPassword, confirmForgotPassword, getUserId } = require("../service/authService");
 const { mapCognitoError } = require("../utils/common");
 
 exports.signup = async (req, res) => {
@@ -106,5 +106,20 @@ exports.confirmForgotPassword = async (req, res) => {
     } catch (err) {
         console.error("Confirm Forgot Password Error:", err);
         res.status(500).json({ error: mapCognitoError(err) });
+    }
+};
+
+exports.getUserId = async (req, res) => {
+    try {
+        const { email } = req.query;
+        const result = await getUserId(email);
+        if (!result || !result.success) {
+            console.error('getUserId service returned error:', result && result.error);
+            return res.status(500).json({ error: result?.error || 'Failed to get user ID' });
+        }
+        res.json({ userId: result.data });
+    } catch (err) {
+        console.error('getUserId error:', err);
+        res.status(500).json({ error: 'Failed to get user ID' });
     }
 };

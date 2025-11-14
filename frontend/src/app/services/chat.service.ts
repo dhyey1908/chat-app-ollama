@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../utils/envirnment';
 
@@ -25,38 +25,53 @@ export class ChatService {
 
   constructor(private http: HttpClient) { }
 
+  private getAuthHttpOptions(): { headers: HttpHeaders } {
+    const token = localStorage.getItem('token');
+    let headers = new HttpHeaders();
+    if (token) {
+      headers = headers.set('Authorization', `Bearer ${token}`);
+    }
+    return { headers };
+  }
+
   getAllSessions(): Observable<Chat[]> {
     const userId = localStorage.getItem(this.userIdKey);
-    return this.http.get<Chat[]>(`${this.apiUrl}/sessions?userId=${userId}`);
+    return this.http.get<Chat[]>(`${this.apiUrl}/chat/sessions?userId=${userId}`, this.getAuthHttpOptions());
   }
 
   createChat(title: string = 'New Chat'): Observable<any> {
     const userId = localStorage.getItem(this.userIdKey);
-    return this.http.post(`${this.apiUrl}/sync-chats`, { userId, title });
+    return this.http.post(`${this.apiUrl}/chat/sync-chats`, { userId, title }, this.getAuthHttpOptions());
   }
 
   getSessionMessages(sessionId: string): Observable<Message[]> {
-    return this.http.get<Message[]>(`${this.apiUrl}/messages?sessionId=${sessionId}`);
+    return this.http.get<Message[]>(`${this.apiUrl}/chat/messages?sessionId=${sessionId}`, this.getAuthHttpOptions());
   }
 
   saveMessage(sessionId: string, from: 'user' | 'bot', text: string): Observable<any> {
-    return this.http.post(`${this.apiUrl}/messages`, { sessionId, sender: from, text });
+    return this.http.post(`${this.apiUrl}/chat/messages`, { sessionId, sender: from, text }, this.getAuthHttpOptions());
   }
 
   deleteChat(sessionId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/session/${sessionId}`);
+    return this.http.delete(`${this.apiUrl}/chat/session/${sessionId}`, this.getAuthHttpOptions());
   }
 
   clearAllChats(): Observable<any> {
     const userId = localStorage.getItem(this.userIdKey);
-    return this.http.delete(`${this.apiUrl}/clear/${userId}`);
+    return this.http.delete(`${this.apiUrl}/chat/clear/${userId}`, this.getAuthHttpOptions());
   }
 
   sendMessage(chat: Chat, prompt: string, model: string): Observable<string> {
+    const token = localStorage.getItem('token');
+    const fetchHeaders: Record<string, string> = {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    };
+
     return new Observable<string>(observer => {
-      fetch(`${this.apiUrl}/chat`, {
+      fetch(`${this.apiUrl}/chat/model`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: fetchHeaders,
         body: JSON.stringify({
           model: model,
           messages: chat.messages

@@ -3,16 +3,15 @@ const cors = require("cors");
 const chatRoutes = require("./routes/chatRoutes");
 const authRoutes = require("./routes/authRoutes");
 const contactRoutes = require("./routes/contactRoutes");
+const { verifyToken } = require("./middleware/verifyToken");
 
 const PORT = process.env.PORT || 5000;
 const app = express();
 
 app.use(cors());
-
 app.use(express.json());
 
 app.use((req, res, next) => {
-  console.log(`${req.method} ${req.url}`);
   next();
 });
 
@@ -24,9 +23,9 @@ app.use((err, req, res, next) => {
   next();
 });
 
-app.use("/api", chatRoutes);
 app.use("/api", authRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/chat", verifyToken, chatRoutes);
 
 app.use((req, res) => {
   res.status(404).json({ error: "Route not found" });
