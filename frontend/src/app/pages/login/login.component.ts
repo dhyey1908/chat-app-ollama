@@ -56,7 +56,6 @@ export class LoginComponent {
           return;
         }
         localStorage.setItem('email', this.email);
-        localStorage.setItem('token', res.data.AuthenticationResult.AccessToken);
         this.authService.getUserId(this.email).subscribe({
           next: (res: any) => {
             if (res && res.userId) {
@@ -92,7 +91,6 @@ export class LoginComponent {
   loginWithGoogle() {
     try {
       this.authService.redirectToGoogle();
-      sessionStorage.setItem('googleAuthInProgress', 'true');
     } catch (error) {
       console.error('Failed to redirect to Google:', error);
       this.showSnackBar('Failed to start Google login', 'Close');
@@ -100,19 +98,27 @@ export class LoginComponent {
   }
 
   private handleGoogleCallback(code: string) {
-    console.log('Handling Google callback with code');
-    if (!sessionStorage.getItem('googleAuthInProgress')) {
-      console.warn('No Google auth was in progress, but received a callback');
-    }
-
     this.authService.handleGoogleCallback(code).subscribe({
       next: (res: any) => {
         if (res) {
+          const token = res?.data?.AuthenticationResult?.AccessToken || res?.tokens?.access_token || res?.data?.tokens?.access_token || res?.accessToken;
+          if (token) {
+            localStorage.setItem('access_token', token);
+          }
           localStorage.setItem('email', res.email || 'google-user');
-          localStorage.setItem('token', res.tokens.access_token);
-          sessionStorage.removeItem('googleAuthInProgress');
           this.showSnackBar('Google Login Successful', 'Close');
-          console.log('Google login successful, redirecting to home...');
+          this.authService.getUserId(res.email).subscribe({
+            next: (res: any) => {
+              if (res && res.userId) {
+                localStorage.setItem('userId', res.userId);
+              } else {
+                console.error('Invalid userId response:', res);
+              }
+            },
+            error: (err) => {
+              console.error('Failed to fetch userId:', err);
+            }
+          });
           setTimeout(() => {
             this.router.navigate(['/']);
           }, 1000);
@@ -124,7 +130,6 @@ export class LoginComponent {
       },
       error: (err) => {
         console.error('Google login failed:', err);
-        sessionStorage.removeItem('googleAuthInProgress');
         this.showSnackBar(err.error?.message || 'Google Login Failed', 'Close');
         this.router.navigate(['/login']);
       }

@@ -32,7 +32,7 @@ export class AuthService {
   }
 
   loginUser(data: userData) {
-    return this.http.post<userData>(`${environment.apiUrl}/login`, data);
+    return this.http.post<userData>(`${environment.apiUrl}/login`, data, { withCredentials: true });
   }
 
   redirectToGoogle() {
@@ -44,17 +44,16 @@ export class AuthService {
       `&redirect_uri=${encodeURIComponent(environment.UiUrl + '/login')}` +
       `&scope=${(environment.scope)}`;
 
-    console.log('Redirecting to:', url);
     window.location.href = url;
   }
 
   handleGoogleCallback(code: string) {
-    return this.http.post<any>(`${environment.apiUrl}/google/token`, { code });
+    return this.http.post<any>(`${environment.apiUrl}/google/token`, { code }, { withCredentials: true });
   }
 
   logout() {
     localStorage.removeItem('email');
-    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
     sessionStorage.clear();
 
     const logoutUrl =

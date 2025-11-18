@@ -51,10 +51,11 @@ exports.login = async (req, res) => {
         const accessToken = result.data?.AuthenticationResult?.AccessToken;
 
         if (accessToken) {
+            const isProd = process.env.NODE_ENV === 'production';
             res.cookie('access_token', accessToken, {
                 httpOnly: true,
-                secure: false,
-                sameSite: 'lax',
+                secure: isProd, 
+                sameSite: isProd ? 'none' : 'lax',
                 path: '/',
                 maxAge: 60 * 60 * 1000,
             });
@@ -80,6 +81,20 @@ exports.googleToken = async (req, res) => {
             console.error('exchangeCodeForTokens service returned error:', result && result.error);
             return res.status(500).json({ error: result?.error || 'Failed to exchange authorization code' });
         }
+        const accessToken = result?.tokens?.access_token;
+        if (accessToken) {
+            const isProd = process.env.NODE_ENV === 'production';
+            res.cookie('access_token', accessToken, {
+                httpOnly: true,
+                secure: isProd,
+                sameSite: isProd ? 'none' : 'lax',
+                path: '/',
+                maxAge: 60 * 60 * 1000,
+            });
+        } else {
+            console.warn('Login succeeded but no access token present in authentication result', result);
+        }
+
         res.json(result);
     } catch (err) {
         console.error("Google token exchange error:", err.response?.data || err);
