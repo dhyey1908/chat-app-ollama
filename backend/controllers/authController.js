@@ -1,5 +1,9 @@
 const { signup, confirmUser, login, exchangeCodeForTokens, forgotPassword, confirmForgotPassword, getUserId } = require("../service/authService");
 const { mapCognitoError } = require("../utils/common");
+const { addToken } = require('../service/tokenBlacklist');
+const jwt = require('jsonwebtoken');
+
+const isProd = process.env.NODE_ENV === 'production';
 
 exports.signup = async (req, res) => {
     if (!req.body.email || !req.body.password) {
@@ -51,10 +55,9 @@ exports.login = async (req, res) => {
         const accessToken = result.data?.AuthenticationResult?.AccessToken;
 
         if (accessToken) {
-            const isProd = process.env.NODE_ENV === 'production';
             res.cookie('access_token', accessToken, {
                 httpOnly: true,
-                secure: isProd, 
+                secure: isProd,
                 sameSite: isProd ? 'none' : 'lax',
                 path: '/',
                 maxAge: 60 * 60 * 1000,
@@ -63,7 +66,7 @@ exports.login = async (req, res) => {
             console.warn('Login succeeded but no access token present in authentication result', result);
         }
 
-        res.json(result);
+        res.json({ success: true, message: 'Login successful' });
     } catch (err) {
         console.error("Login Error:", err);
         res.status(401).json({ error: mapCognitoError(err) });
@@ -83,7 +86,6 @@ exports.googleToken = async (req, res) => {
         }
         const accessToken = result?.tokens?.access_token;
         if (accessToken) {
-            const isProd = process.env.NODE_ENV === 'production';
             res.cookie('access_token', accessToken, {
                 httpOnly: true,
                 secure: isProd,
@@ -95,10 +97,43 @@ exports.googleToken = async (req, res) => {
             console.warn('Login succeeded but no access token present in authentication result', result);
         }
 
-        res.json(result);
+        res.json({ success: true, message: 'Login successful' });
     } catch (err) {
         console.error("Google token exchange error:", err.response?.data || err);
         res.status(500).json({ error: "Failed to exchange authorization code" });
+    }
+};
+
+exports.logout = async (req, res) => {
+    try {
+        let token = req.cookies?.access_token;
+        if (!token && req.headers.authorization) {
+            const authHeader = req.headers.authorization;
+            token = authHeader.split(' ')[1];
+        }
+
+        if (token) {
+            try {
+                const decoded = jwt.decode(token);
+                const exp = decoded?.exp;
+                await addToken(token, exp);
+            } catch (err) {
+                console.error('Failed to decode token during logout:', err);
+                await addToken(token);
+            }
+        }
+
+        res.clearCookie('access_token', {
+            httpOnly: true,
+            secure: isProd,
+            sameSite: isProd ? 'none' : 'lax',
+            path: '/',
+        });
+
+        return res.json({ success: true, message: 'Logged out' });
+    } catch (err) {
+        console.error('Logout error:', err);
+        return res.status(500).json({ success: false, message: 'Logout failed' });
     }
 };
 

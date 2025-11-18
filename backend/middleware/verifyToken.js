@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const jwkToPem = require("jwk-to-pem");
 const axios = require("axios");
 require("dotenv").config();
+const { isBlacklisted } = require("../service/tokenBlacklist");
 
 const poolRegion = process.env.COGNITO_REGION;
 const userPoolId = process.env.COGNITO_USER_POOL_ID;
@@ -39,6 +40,13 @@ async function verifyToken(req, res, next) {
             return res.status(401).json({
                 success: false,
                 message: "Missing authentication token",
+            });
+        }
+
+        if (await isBlacklisted(token)) {
+            return res.status(401).json({
+                success: false,
+                message: "Token has been revoked",
             });
         }
 

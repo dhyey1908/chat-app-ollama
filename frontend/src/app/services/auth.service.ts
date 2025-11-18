@@ -52,16 +52,30 @@ export class AuthService {
   }
 
   logout() {
-    localStorage.removeItem('email');
-    localStorage.removeItem('userId');
-    sessionStorage.clear();
+    this.http.post<any>(`${environment.apiUrl}/logout`, {}, { withCredentials: true }).subscribe({
+      next: () => {
+        localStorage.removeItem('email');
+        localStorage.removeItem('userId');
 
-    const logoutUrl =
-      `https://${environment.cognitoDomain}/logout` +
-      `?client_id=${environment.cognitoClientId}` +
-      `&logout_uri=${environment.UiUrl}/login`;
+        const logoutUrl =
+          `https://${environment.cognitoDomain}/logout` +
+          `?client_id=${environment.cognitoClientId}` +
+          `&logout_uri=${environment.UiUrl}/login`;
 
-    window.location.href = logoutUrl;
+        window.location.href = logoutUrl;
+      },
+      error: (err) => {
+        console.error('Backend logout failed, proceeding to redirect', err);
+        // Proceed anyway to clear client state and redirect
+        localStorage.removeItem('email');
+        localStorage.removeItem('userId');
+        const logoutUrl =
+          `https://${environment.cognitoDomain}/logout` +
+          `?client_id=${environment.cognitoClientId}` +
+          `&logout_uri=${environment.UiUrl}/login`;
+        window.location.href = logoutUrl;
+      }
+    });
   }
 
   forgotPassword(email: string) {
