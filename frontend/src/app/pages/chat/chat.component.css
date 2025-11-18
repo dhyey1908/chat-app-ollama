@@ -26,7 +26,6 @@
   cursor: pointer;
   font-size: larger;
   font-weight: 500;
-  padding-left: 20px;
 }
 
 .markdown code {
@@ -39,13 +38,16 @@
 .chat-header {
   background: white;
   color: black;
-  padding: 1rem;
+  padding: 1rem 15px;
   text-align: left;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   padding: 8px 15px;
   cursor: pointer;
+}
+
+.spacer {
+  flex: 1;
 }
 
 .user-profile {
@@ -123,6 +125,13 @@
 .chat-messages .message.bot mat-card {
   background: #e0e0e0;
   color: black;
+  padding: 1rem 15px;
+  display: flex;
+  align-items: center;
+}
+
+.spacer {
+  flex: 1;
 }
 
 .chat-input {
@@ -137,61 +146,10 @@
   margin-right: 10px;
 }
 
-.message.bot p {
-  display: inline-block;
-  margin: 0;
-}
-
-/* Typing animation */
-.typing {
-  display: inline-block;
-  font-size: 16px;
-}
-
-.typing span {
-  animation: blink 1.4s infinite both;
-}
-
-.typing span:nth-child(2) {
-  animation-delay: 0.2s;
-}
-
-.typing span:nth-child(3) {
-  animation-delay: 0.4s;
-}
-
-@keyframes blink {
-  0% {
-    opacity: 0.2;
-  }
-
-  20% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 0.2;
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(5px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Sidebar styling */
 .chat-sidebar {
   position: fixed;
-  left: -240px;
+  left: -245px;
   top: 0;
-  width: 220px;
   height: 100%;
   background: #f0f0f0;
   border-right: 1px solid #ddd;
@@ -262,77 +220,88 @@
 
 /* Sidebar toggle button */
 .sidebar-toggle {
-  position: fixed;
-  left: 200px;
-  top: 5px;
-  z-index: 1100;
   background: white;
   color: black;
   border: none;
   border-radius: 4px;
   width: 40px;
   height: 40px;
+  margin-right: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-  transition: background 0.2s ease;
 }
 
-.sidebar-toggle:hover {
-  background: rgb(243, 241, 238);
-}
-
-/* Wrapper for chat container */
 .chat-wrapper {
   transition: margin-left 0.3s ease;
 }
 
-/* Shift chat when sidebar is open */
 .chat-wrapper.shift {
   margin-left: 250px;
 }
 
-.dot-loader {
+/* Enhanced Typing Indicator - Kept as requested */
+.typing-indicator {
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 40px;
-  gap: 10px;
+  gap: 8px;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 18px;
+  backdrop-filter: blur(10px);
+  animation: pulse 2s infinite;
 }
 
-.dot-loader::before,
-.dot-loader::after,
-.dot-loader span {
-  content: '';
-  width: 12px;
-  height: 12px;
-  background-color: #3f51b5;
+.typing-dot {
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  display: inline-block;
-  animation: bounce 1.4s infinite ease-in-out;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  animation: typingPulse 1.4s infinite ease-in-out;
 }
 
-.dot-loader span {
-  animation-delay: -0.2s;
+.typing-dot:nth-child(2) {
+  animation-delay: 0.2s;
 }
 
-.dot-loader::after {
-  animation-delay: -0.4s;
+.typing-dot:nth-child(3) {
+  animation-delay: 0.4s;
 }
 
-@keyframes bounce {
+.typing-text {
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+  font-weight: 500;
+}
 
-  0%,
-  80%,
-  100% {
-    transform: scale(0);
+@keyframes typingPulse {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
   }
-
   40% {
     transform: scale(1);
+    opacity: 1;
   }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+}
+
+/* Basic styling only */
+.chat-input textarea {
+  resize: none;
+  line-height: 1.4rem;
+  font-size: 14px;
 }
 
 .cleared-animation {
@@ -384,4 +353,6 @@
 .try-again {
   margin: 6px;
   cursor: pointer;
+  font-size: larger;
+  font-weight: 500;
 }

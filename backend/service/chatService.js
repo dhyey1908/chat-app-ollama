@@ -82,3 +82,16 @@ exports.clearAllChats = async (userId) => {
         return { success: false, error: error?.message || 'Failed to clear chats' };
     }
 };
+
+exports.updateChatTitle = async (sessionId, title) => {
+    try {
+        await db.query(
+            'UPDATE chat_sessions SET title = ? WHERE id = ?',
+            [title, sessionId]
+        );
+        return { success: true, message: "Chat title updated successfully." };
+    } catch (error) {
+        console.error('updateChatTitle Service Error:', error);
+        return { success: false, error: error?.message || 'Failed to update chat title' };
+    }
+};

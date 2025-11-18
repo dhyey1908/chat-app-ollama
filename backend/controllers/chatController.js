@@ -1,5 +1,5 @@
 const http = require('http');
-const { getSessionMessages, getUserSessions, addMessage, clearAllChats, createChat, deleteChat } = require('../service/chatService');
+const { getSessionMessages, getUserSessions, addMessage, clearAllChats, createChat, deleteChat, updateChatTitle } = require('../service/chatService');
 
 exports.chatWithModel = async (req, res) => {
   const { model, messages, temperature, max_tokens } = req.body;
@@ -150,5 +150,23 @@ exports.clearAllChats = async (req, res) => {
   } catch (err) {
     console.error('clearAllChats error:', err);
     res.status(500).json({ error: 'Failed to clear chats' });
+  }
+};
+
+exports.updateChatTitle = async (req, res) => {
+  try {
+    const { sessionId, title } = req.body;
+    if (!sessionId || !title)
+      return res.status(400).json({ error: 'Missing required fields' });
+
+    const result = await updateChatTitle(sessionId, title);
+    if (!result || !result.success) {
+      console.error('updateChatTitle service returned error:', result && result.error);
+      return res.status(500).json({ error: result?.error || 'Failed to update chat title' });
+    }
+    res.json({ success: true });
+  } catch (err) {
+    console.error('updateChatTitle error:', err);
+    res.status(500).json({ error: 'Failed to update chat title' });
   }
 };

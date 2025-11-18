@@ -54,6 +54,10 @@ export class ChatService {
     return this.http.delete(`${this.apiUrl}/chat/session/${sessionId}`, this.getHttpOptions());
   }
 
+  updateChatTitle(sessionId: string, title: string): Observable<any> {
+    return this.http.post(`${this.apiUrl}/chat/update-title`, { sessionId, title }, this.getHttpOptions());
+  }
+
   clearAllChats(): Observable<any> {
     const userId = localStorage.getItem(this.userIdKey);
     return this.http.delete(`${this.apiUrl}/chat/clear/${userId}`, this.getHttpOptions());

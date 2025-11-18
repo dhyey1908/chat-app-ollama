@@ -189,6 +189,7 @@ export class ChatComponent implements OnInit {
 
     if (this.activeChat.messages.length === 1) {
       this.activeChat.title = userMessage.text.length > 20 ? userMessage.text.slice(0, 20) + '...' : userMessage.text;
+      this.chatService.updateChatTitle(this.activeChat.id, this.activeChat.title).subscribe();
     }
 
     // Save user message to DB
