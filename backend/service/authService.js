@@ -74,7 +74,7 @@ exports.confirmUser = async (email, code) => {
             return {
                 success: true,
                 message: "User already exists in database.",
-                user: existing[0],
+                data: existing[0],
             };
         }
 
@@ -91,7 +91,7 @@ exports.confirmUser = async (email, code) => {
         return {
             success: true,
             message: "User confirmed and added to database successfully!",
-            user: newUser[0],
+            data: newUser[0],
         };
     } catch (error) {
         console.error("Confirm User Error:", error);
@@ -156,8 +156,10 @@ exports.exchangeCodeForTokens = async (code) => {
 
         return {
             success: true,
-            tokens: response.data,
-            email: email
+            data: {
+                tokens: response.data,
+                email: email
+            }
         };
     } catch (error) {
         console.error("Token exchange failed:", error.response?.data || error.message);
@@ -184,7 +186,7 @@ exports.refreshTokens = async (refreshToken) => {
 
         return {
             success: true,
-            tokens: response.data,
+            data: response.data,
         };
     } catch (error) {
         console.error("Token refresh failed:", error.response?.data || error.message);

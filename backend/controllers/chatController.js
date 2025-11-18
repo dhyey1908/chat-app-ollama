@@ -61,17 +61,17 @@ exports.chatWithModel = async (req, res) => {
 exports.createChat = async (req, res) => {
   try {
     const { userId, title } = req.body;
-    if (!userId) return res.status(400).json({ error: 'Missing userId' });
+    if (!userId) return res.status(400).json({ success: false, error: 'Missing userId' });
 
     const result = await createChat(userId, title || 'New Chat');
     if (!result || !result.success) {
       console.error('createChat service returned error:', result && result.error);
-      return res.status(500).json({ error: result?.error || 'Failed to create chat session' });
+      return res.status(500).json({ success: false, error: result?.error || 'Failed to create chat session' });
     }
-    res.json({ success: true, chat: result.data });
+    res.json({ success: true, data: result.data, message: result.message });
   } catch (err) {
     console.error('createChat error:', err);
-    res.status(500).json({ error: 'Failed to create chat session' });
+    res.status(500).json({ success: false, error: 'Failed to create chat session' });
   }
 };
 
@@ -152,4 +152,3 @@ exports.clearAllChats = async (req, res) => {
     res.status(500).json({ error: 'Failed to clear chats' });
   }
 };
-
