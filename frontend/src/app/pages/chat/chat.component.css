@@ -23,80 +23,11 @@
   overflow-x: auto;
 }
 
-.logo {
-  cursor: pointer;
-  font-size: larger;
-  font-weight: 500;
-}
-
 .markdown code {
   background: #eee;
   padding: 2px 4px;
   border-radius: 4px;
   font-family: monospace;
-}
-
-.chat-header {
-  background: rgba(255, 255, 255, 0.9);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
-  color: black;
-  padding: 1rem 15px;
-  text-align: left;
-  display: flex;
-  align-items: center;
-  padding: 8px 15px;
-  cursor: pointer;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.spacer {
-  flex: 1;
-}
-
-.user-profile {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  padding: 6px 10px;
-}
-
-.user-email {
-  font-size: 14px;
-  color: #333;
-  font-weight: 500;
-  padding: 10px;
-}
-
-.avatar {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: #fff;
-  border-radius: 50%;
-  font-size: 22px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-transform: uppercase;
-}
-
-.menu-content {
-  padding: 10px;
-}
-
-.profile-menu .menu-content {
-  text-align: center;
-  padding: 12px 20px 6px;
-}
-
-.profile-menu .email {
-  font-size: 14px;
-  color: #333;
-  margin-top: 8px;
-  font-weight: 500;
-  padding: 50px;
 }
 
 .chat-messages {
@@ -281,31 +212,6 @@
   flex-shrink: 0;
   cursor: pointer;
   margin-left: 8px;
-}
-
-/* Sidebar toggle button */
-.sidebar-toggle {
-  background: white;
-  color: #667eea;
-  border: 2px solid rgba(102, 126, 234, 0.2);
-  border-radius: 8px;
-  width: 42px;
-  height: 42px;
-  margin-right: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
-  transition: all 0.3s ease;
-}
-
-.sidebar-toggle:hover {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  border-color: transparent;
-  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-  transform: scale(1.05);
 }
 
 .chat-wrapper {

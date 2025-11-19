@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,11 +15,19 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './navbar.component.css'
 })
 export class NavbarComponent {
+  @Input() showSidebarToggle = false;
+  @Input() sidebarOpen = false;
+  @Output() sidebarToggle = new EventEmitter<void>();
+
   userEmail: string | null = null;
 
-  constructor(private router: Router, private authService : AuthService) { }
+  constructor(private router: Router, private authService: AuthService) { }
   ngOnInit() {
     this.userEmail = localStorage.getItem('email');
+  }
+
+  onToggleSidebar() {
+    this.sidebarToggle.emit();
   }
 
   logout() {

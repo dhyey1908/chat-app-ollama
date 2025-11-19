@@ -45,6 +45,31 @@
     transform: scale(1.05);
   }
 
+  /* Sidebar toggle button */
+  .sidebar-toggle {
+    background: white;
+    color: #667eea;
+    border: 2px solid rgba(102, 126, 234, 0.2);
+    border-radius: 8px;
+    width: 42px;
+    height: 42px;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+    transition: all 0.3s ease;
+  }
+
+  .sidebar-toggle:hover {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    transform: scale(1.05);
+  }
+
   .spacer {
     flex: 1;
   }

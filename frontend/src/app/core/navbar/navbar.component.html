@@ -1,4 +1,9 @@
 <mat-toolbar color="white" class="navbar">
+  <!-- Sidebar Toggle Button (Only visible when enabled) -->
+  <button *ngIf="showSidebarToggle" mat-icon-button class="sidebar-toggle" (click)="onToggleSidebar()">
+    <mat-icon>{{ sidebarOpen ? 'close' : 'menu' }}</mat-icon>
+  </button>
+
   <div class="logo" routerLink="/">
     <img src="assets/images/geniechat-logo.png" alt="GenieChat Logo" class="logo-icon">
     <span class="logo-text">GenieChat</span>

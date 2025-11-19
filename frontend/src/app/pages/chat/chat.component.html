@@ -25,34 +25,8 @@
 <!-- Wrapper to move chat container when sidebar opens -->
 <div class="chat-wrapper" [class.shift]="sidebarOpen">
   <div class="chat-container">
-    <div class="chat-header">
-      <!-- Sidebar Toggle Button -->
-      <button class="sidebar-toggle" [class.open]="sidebarOpen" (click)="toggleSidebar()">
-        <mat-icon>{{ sidebarOpen ? 'close' : 'menu' }}</mat-icon>
-      </button>
-
-      <span class="logo" (click)="navigateToHome()">🔮 GenieChat</span>
-
-      <div class="spacer"></div>
-
-      <!-- User Profile Section -->
-      <div class="user-profile" [matMenuTriggerFor]="userMenu">
-        <div class="avatar">{{ userEmail.charAt(0).toUpperCase() || '' }}
-        </div>
-      </div>
-
-      <!-- Popup Menu -->
-      <mat-menu #userMenu="matMenu" class="profile-menu">
-        <div class="menu-content">
-          <p class="email">{{ userEmail }}</p>
-        </div>
-
-        <button mat-menu-item (click)="logout()">
-          <mat-icon>logout</mat-icon>
-          Logout
-        </button>
-      </mat-menu>
-    </div>
+    <app-navbar [showSidebarToggle]="true" [sidebarOpen]="sidebarOpen" (sidebarToggle)="toggleSidebar()">
+    </app-navbar>
 
     <div class="chat-messages" #scrollMe>
       <div *ngIf="historyCleared" class="cleared-animation">

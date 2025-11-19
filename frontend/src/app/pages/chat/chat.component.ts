@@ -15,6 +15,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
 import { Router } from '@angular/router';
 import { Chat, Message } from '../../services/chat.service';
+import { NavbarComponent } from '../../core/navbar/navbar.component';
 
 @Component({
   selector: 'app-chat',
@@ -28,7 +29,8 @@ import { Chat, Message } from '../../services/chat.service';
     MatIconModule,
     MarkdownModule,
     MatSelectModule,
-    MatMenuModule
+    MatMenuModule,
+    NavbarComponent
   ],
   templateUrl: './chat.component.html',
   styleUrl: './chat.component.css'
