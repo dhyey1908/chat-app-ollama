@@ -66,7 +66,7 @@ exports.login = async (req, res) => {
             console.warn('Login succeeded but no access token present in authentication result', result);
         }
 
-        res.json({ success: true, data: result.data, message: 'Login successful' });
+        res.json({ success: true, message: 'Login successful' });
     } catch (err) {
         console.error("Login Error:", err);
         res.status(401).json({ success: false, error: mapCognitoError(err) });

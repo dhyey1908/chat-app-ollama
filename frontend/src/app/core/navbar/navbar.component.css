@@ -1,12 +1,28 @@
 .navbar {
   display: flex;
   justify-content: space-between;
-  padding: 0 20px;
+  padding: 0 24px;
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  position: sticky;
+  top: 0;
+  z-index: 100;
 
   .logo {
     font-weight: 700;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     cursor: pointer;
+    transition: all 0.3s ease;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .logo:hover {
+    transform: scale(1.05);
   }
 
   .spacer {
@@ -15,10 +31,34 @@
 
   a {
     margin-right: 10px;
+    position: relative;
+    transition: all 0.3s ease;
+  }
+
+  a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+  }
+
+  a:hover::after {
+    width: 80%;
   }
 
   button {
     margin-right: 10px;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+
+  button:hover {
+    transform: translateY(-2px);
   }
 }
 
@@ -40,14 +80,23 @@
 .avatar {
   width: 40px;
   height: 40px;
-  background: #1976d2;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #fff;
   border-radius: 50%;
-  font-size: 22px;
+  font-size: 18px;
+  font-weight: 600;
   display: flex;
   justify-content: center;
   align-items: center;
   text-transform: uppercase;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+  transition: all 0.3s ease;
+}
+
+.avatar:hover {
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.4),
+    0 4px 15px rgba(102, 126, 234, 0.3);
+  transform: scale(1.05);
 }
 
 .menu-content {

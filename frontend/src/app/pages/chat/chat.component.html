@@ -10,10 +10,10 @@
     </mat-select>
   </mat-form-field>
 
-  <h3>Chats History</h3>
   <button mat-button color="primary" (click)="startNewChat()">+ New Chat</button>
   <button mat-button color="warn" (click)="clearAllChats()">🗑 Clear All</button>
-
+  <br><br>
+  <h3>Chats History</h3>
   <div class="chat-list">
     <div class="chat-item" *ngFor="let chat of chats" [class.active]="chat.id === activeChat.id">
       <span class="chat-title" (click)="selectChat(chat)">{{ chat.title }}</span>

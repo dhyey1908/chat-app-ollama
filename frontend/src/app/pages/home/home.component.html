@@ -1,20 +1,75 @@
 <div class="landing-container">
 
-  <div class="hero-section">
-    <h1>GenieChat</h1>
+  <!-- Animated Floating Particles -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
 
-    <p class="typing-text">
-      <span id="typing"></span>
+  <!-- Animated Geometric Shapes -->
+  <div class="shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <div class="hero-section">
+    <!-- Main Title with Letter Animation -->
+    <h1 class="main-title">
+      <span class="title-word">Genie</span><span class="title-word accent">Chat</span>
+    </h1>
+
+    <!-- Subtitle with Gradient Animation -->
+    <p class="subtitle">
+      Your AI-Powered Conversation Partner
     </p>
 
-    <button mat-raised-button color="primary" (click) = "handleNavigation()" class="start-button">
-      🚀 Start Chatting
+    <!-- Typing Effect Text -->
+    <p class="typing-text">
+      <span id="typing"></span>
+      <span class="cursor">|</span>
+    </p>
+
+    <!-- Animated CTA Button -->
+    <button mat-raised-button color="primary" (click)="handleNavigation()" class="start-button">
+      <span class="button-content">
+        <span class="button-icon">🚀</span>
+        <span class="button-text">Start Chatting</span>
+      </span>
+      <span class="button-shine"></span>
     </button>
 
+    <!-- Feature Cards with Staggered Animation -->
     <div class="features">
-      <div class="feature-card">⚡ Instant Smart Replies</div>
-      <div class="feature-card">🔒 Secure Conversations</div>
-      <div class="feature-card">🌍 Multilingual AI Support</div>
+      <div class="feature-card" style="animation-delay: 0.1s">
+        <div class="feature-icon">⚡</div>
+        <div class="feature-content">
+          <h3>Instant Replies</h3>
+          <p>Lightning-fast AI responses</p>
+        </div>
+      </div>
+      <div class="feature-card" style="animation-delay: 0.2s">
+        <div class="feature-icon">🔒</div>
+        <div class="feature-content">
+          <h3>Secure Chat</h3>
+          <p>End-to-end encryption</p>
+        </div>
+      </div>
+      <div class="feature-card" style="animation-delay: 0.3s">
+        <div class="feature-icon">🌍</div>
+        <div class="feature-content">
+          <h3>Multilingual</h3>
+          <p>Speak in any language</p>
+        </div>
+      </div>
     </div>
   </div>
 
