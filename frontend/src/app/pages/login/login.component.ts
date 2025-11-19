@@ -101,13 +101,10 @@ export class LoginComponent {
     this.authService.handleGoogleCallback(code).subscribe({
       next: (res: any) => {
         if (res) {
-          // const token = res?.data?.AuthenticationResult?.AccessToken || res?.tokens?.access_token || res?.data?.tokens?.access_token || res?.accessToken;
-          // if (token) {
-          //   localStorage.setItem('access_token', token);
-          // }
-          localStorage.setItem('email', res.email || 'google-user');
+
+          localStorage.setItem('email', res?.data?.email || 'google-user');
           this.showSnackBar('Google Login Successful', 'Close');
-          this.authService.getUserId(res.email).subscribe({
+          this.authService.getUserId(res?.data?.email).subscribe({
             next: (res: any) => {
               if (res && res.userId) {
                 localStorage.setItem('userId', res.userId);

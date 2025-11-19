@@ -97,7 +97,7 @@ exports.googleToken = async (req, res) => {
             console.warn('Login succeeded but no access token present in authentication result', result);
         }
 
-        res.json({ success: true, data: result.data, message: 'Login successful' });
+        res.json({ success: true, data: { email: result.data.email }, message: 'Login successful' });
     } catch (err) {
         console.error("Google token exchange error:", err.response?.data || err);
         res.status(500).json({ success: false, error: "Failed to exchange authorization code" });
