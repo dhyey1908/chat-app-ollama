@@ -263,6 +263,74 @@
 }
 
 /* ========================================
+   HERO LOGO
+   ======================================== */
+
+.hero-logo {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+  animation: logoEntrance 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+.hero-logo-img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 10px 40px rgba(102, 126, 234, 0.6));
+  animation: logoFloat 4s ease-in-out infinite, logoGlow 3s ease-in-out infinite;
+}
+
+@keyframes logoEntrance {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.2) rotate(10deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+@keyframes logoFloat {
+
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  25% {
+    transform: translateY(-15px) rotate(5deg);
+  }
+
+  50% {
+    transform: translateY(-10px) rotate(0deg);
+  }
+
+  75% {
+    transform: translateY(-15px) rotate(-5deg);
+  }
+}
+
+@keyframes logoGlow {
+
+  0%,
+  100% {
+    filter: drop-shadow(0 10px 40px rgba(102, 126, 234, 0.6));
+  }
+
+  50% {
+    filter: drop-shadow(0 15px 60px rgba(240, 147, 251, 0.8));
+  }
+}
+
+/* ========================================
    MAIN TITLE
    ======================================== */
 

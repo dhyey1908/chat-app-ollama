@@ -11,17 +11,37 @@
   z-index: 100;
 
   .logo {
-    font-weight: 700;
-    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
     cursor: pointer;
     transition: all 0.3s ease;
+  }
+
+  .logo-icon {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 8px rgba(102, 126, 234, 0.3));
+  }
+
+  .logo-text {
+    font-weight: 700;
+    font-size: 1.3rem;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    transition: all 0.3s ease;
   }
 
-  .logo:hover {
+  .logo:hover .logo-icon {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 4px 12px rgba(102, 126, 234, 0.5));
+  }
+
+  .logo:hover .logo-text {
     transform: scale(1.05);
   }
 
