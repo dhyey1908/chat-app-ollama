@@ -13,6 +13,8 @@ import { Subscription } from 'rxjs';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog/confirm-dialog.component';
 import { MatDialog } from '@angular/material/dialog';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { TextFieldModule } from '@angular/cdk/text-field';
 import { Router } from '@angular/router';
 import { Chat, Message } from '../../services/chat.service';
 import { NavbarComponent } from '../../core/navbar/navbar.component';
@@ -30,6 +32,8 @@ import { NavbarComponent } from '../../core/navbar/navbar.component';
     MarkdownModule,
     MatSelectModule,
     MatMenuModule,
+    MatTooltipModule,
+    TextFieldModule,
     NavbarComponent
   ],
   templateUrl: './chat.component.html',
@@ -44,27 +48,40 @@ export class ChatComponent implements OnInit {
   sidebarOpen: boolean = true;
   historyCleared = false;
   currentMessage = '';
+  currentSubtitle = '';
   private botSubscription?: Subscription;
   userEmail: string = '';
   lastUserMessage: string | null = null;
 
-  greetings = [
-    'Hi there 👋 What’s on your mind today?',
-    'Hello! How can I help you get started?',
-    'Looking for something? Let’s explore together.',
-    'Hey! Ready to dive in?',
-    'What would you like to do first?',
-    'Your journey starts here 🚀 What brings you today ?',
-    'Hi 👋 Shall we begin ?',
-    'How can I make your day easier ?',
-    'Welcome back! What’s next ?',
-    'Let’s start the conversation 💬'
+  funHeadlines = [
+    "Beep boop! 🤖 Ready for some magic?",
+    "System online. Creativity: 100% 🚀",
+    "Greetings, human! 🖖 Let's build something epic.",
+    "I've had my coffee ☕ (it was electricity). What's next?",
+    "Brainstorming mode: ACTIVATED 💡",
+    "Ready to crunch some data? 🥣 (Or just chat?)",
+    "Let's turn those ideas into reality! ✨",
+    "Awaiting your command, Captain! 🫡",
+    "Zero bugs, infinite possibilities! 🐞",
+    "I'm listening... with all my algorithms! 👂"
+  ];
+
+  funSubtitles = [
+    "I can write code, tell jokes, or explain the universe. You pick!",
+    "My neural networks are tingling with anticipation.",
+    "Feed me a prompt and watch me go!",
+    "No task is too big (or too small) for my circuits.",
+    "Let's make today productive... or just really fun.",
+    "I'm like a genie, but digital and without the lamp.",
+    "Your wish is my command-line instruction.",
+    "Let's explore the depths of the internet together."
   ];
 
   constructor(private chatService: ChatService, private dialog: MatDialog, private router: Router) {
   }
 
   ngOnInit() {
+
     this.userEmail = localStorage.getItem('email') || 'User';
 
     this.chatService.getAllSessions().subscribe({
@@ -89,31 +106,40 @@ export class ChatComponent implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  private setRandomWelcomeMessage() {
+    this.currentMessage = this.funHeadlines[Math.floor(Math.random() * this.funHeadlines.length)];
+    this.currentSubtitle = this.funSubtitles[Math.floor(Math.random() * this.funSubtitles.length)];
+  }
+
   startNewChat() {
-    const existingEmptyChat = this.chats.find(chat => chat.messages && chat.messages.length === 0);
+    if (this.historyCleared) {
+      this.setRandomWelcomeMessage();
+      return;
+    }
+
+    const existingEmptyChat = this.chats.find(chat =>
+      (chat.messages && chat.messages.length === 0) ||
+      chat.title === 'New Chat'
+    );
 
     if (existingEmptyChat) {
-      this.activeChat = existingEmptyChat;
-      this.historyCleared = true;
-      this.currentMessage = this.getRandomGreeting();
+      this.selectChat(existingEmptyChat);
     } else {
       this.chatService.createChat('New Chat').subscribe({
         next: (res) => {
           this.chatService.getAllSessions().subscribe((sessions) => {
             this.chats = sessions;
-            this.activeChat = sessions[0];
+            if (this.chats.length > 0) {
+              this.activeChat = this.chats[0];
+              this.activeChat.messages = []; // Initialize messages
+            }
             this.historyCleared = true;
-            this.currentMessage = this.getRandomGreeting();
+            this.setRandomWelcomeMessage();
           });
         },
         error: (err) => console.error('Failed to create chat:', err)
       });
     }
-  }
-
-  private getRandomGreeting(): string {
-    const randomIndex = Math.floor(Math.random() * this.greetings.length);
-    return this.greetings[randomIndex];
   }
 
   selectChat(chat: Chat) {
@@ -123,7 +149,7 @@ export class ChatComponent implements OnInit {
         this.activeChat.messages = messages;
         if (messages.length === 0) {
           this.historyCleared = true;
-          this.currentMessage = this.getRandomGreeting();
+          this.setRandomWelcomeMessage();
         } else {
           this.historyCleared = false;
         }
@@ -179,6 +205,11 @@ export class ChatComponent implements OnInit {
         });
       }
     });
+  }
+
+  runPrompt(prompt: string) {
+    this.userInput = prompt;
+    this.sendMessage();
   }
 
   sendMessage() {
@@ -254,5 +285,51 @@ export class ChatComponent implements OnInit {
 
   navigateToHome() {
     this.router.navigate(['/']);
+  }
+
+  copyMessage(text: string) {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        console.log('Copied to clipboard!');
+      },
+      (err) => {
+        console.error('Failed to copy:', err);
+      }
+    );
+  }
+
+  regenerateResponse(messageIndex: number) {
+    if (!this.activeChat?.messages || this.isLoading) return;
+
+    let userMessageIndex = -1;
+    for (let i = messageIndex - 1; i >= 0; i--) {
+      if (this.activeChat.messages[i].from === 'user') {
+        userMessageIndex = i;
+        break;
+      }
+    }
+
+    if (userMessageIndex === -1) return;
+
+    const userMessage = this.activeChat.messages[userMessageIndex].text;
+    this.lastUserMessage = userMessage;
+
+    this.activeChat.messages.splice(messageIndex, 1);
+
+    const botMessage: Message = { from: 'bot', text: '' };
+    this.activeChat.messages.push(botMessage);
+
+    this.isLoading = true;
+    this.botSubscription = this.chatService.sendMessage(this.activeChat, userMessage, this.selectedModel).subscribe({
+      next: (chunk) => (botMessage.text += chunk),
+      error: () => {
+        botMessage.text += '\n⚠️ Error: could not reach server.';
+        this.isLoading = false;
+      },
+      complete: () => {
+        this.isLoading = false;
+        this.chatService.saveMessage(this.activeChat.id, 'bot', botMessage.text).subscribe();
+      }
+    });
   }
 }

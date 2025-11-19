@@ -248,7 +248,6 @@ div.code-toolbar>.toolbar>.toolbar-item>button:hover {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  /* width: 100%; */
   padding: 10px 12px;
   border-radius: 8px;
   cursor: pointer;
@@ -280,7 +279,7 @@ div.code-toolbar>.toolbar>.toolbar-item>button:hover {
 
 .chat-sidebar .chat-list .chat-item.active {
   background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .chat-sidebar .chat-list .chat-item.active::before {
@@ -382,39 +381,127 @@ div.code-toolbar>.toolbar>.toolbar-item>button:hover {
   align-items: center;
   justify-content: center;
   height: 80%;
-  color: #666;
-  font-size: 1.2rem;
+  color: #1e293b;
   text-align: center;
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  padding-bottom: 100px;
+  /* Offset for visual balance */
 }
 
-.cleared-animation .robot {
-  font-size: 3rem;
-  margin-bottom: 10px;
-  animation: bounce 1s infinite alternate;
+.robot-container {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
+.robot-glow {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle, rgba(102, 126, 234, 0.4) 0%, rgba(118, 75, 162, 0) 70%);
+  filter: blur(20px);
+  animation: pulseGlow 3s infinite ease-in-out;
+}
 
-  to {
-    opacity: 1;
+.robot-icon {
+  font-size: 64px;
+  width: 64px;
+  height: 64px;
+  color: #667eea;
+  z-index: 1;
+  filter: drop-shadow(0 4px 10px rgba(102, 126, 234, 0.4));
+  animation: float 3s ease-in-out infinite;
+}
+
+.cleared-animation h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+  background: linear-gradient(135deg, #1e293b 0%, #475569 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.cleared-animation .subtitle {
+  font-size: 1.1rem;
+  color: #64748b;
+  margin: 0 0 40px 0;
+  max-width: 400px;
+  line-height: 1.5;
+}
+
+.suggestions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.suggestion-chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #475569;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.suggestion-chip mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+  color: #667eea;
+}
+
+.suggestion-chip:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.3);
+  color: #667eea;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
     transform: translateY(0);
   }
-}
 
-@keyframes bounce {
-  from {
-    transform: translateY(0);
-  }
-
-  to {
+  50% {
     transform: translateY(-10px);
   }
 }
+
+@keyframes pulseGlow {
+
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.2);
+  }
+}
+
+/* Remove old styles */
+/* .cleared-animation .robot { ... } */
 
 .chat-input textarea {
   resize: none;
@@ -422,9 +509,52 @@ div.code-toolbar>.toolbar>.toolbar-item>button:hover {
   font-size: 14px;
 }
 
+/* Bot Message Actions - Always Visible (ChatGPT Style) */
+.bot-message-actions {
+  display: flex;
+  gap: 4px;
+  margin-top: 12px;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.bot-message-actions:hover {
+  opacity: 1;
+}
+
+.bot-message-actions .action-btn {
+  width: 30px;
+  height: 30px;
+  line-height: 30px;
+  color: #64748b;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+}
+
+.bot-message-actions .action-btn:hover {
+  background: rgba(102, 126, 234, 0.08);
+  color: #667eea;
+}
+
+.bot-message-actions .action-btn mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
 .try-again {
   margin: 6px;
   cursor: pointer;
   font-size: larger;
   font-weight: 500;
+}
+
+/* Tooltip Styling Override */
+::ng-deep .mat-mdc-tooltip {
+  background: rgba(30, 41, 59, 0.95) !important;
+  backdrop-filter: blur(10px);
+  font-size: 12px !important;
+  padding: 6px 12px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
 }

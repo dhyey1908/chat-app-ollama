@@ -30,11 +30,24 @@
 
     <div class="chat-messages" #scrollMe>
       <div *ngIf="historyCleared" class="cleared-animation">
-        <div class="robot">🤖</div>
-        <p>{{ currentMessage }}</p>
+        <div class="robot-container">
+          <div class="robot-glow"></div>
+          <mat-icon class="robot-icon">smart_toy</mat-icon>
+        </div>
+        <h2>{{ currentMessage }}</h2>
+        <p class="subtitle">{{ currentSubtitle }}</p>
+
+        <div class="suggestions">
+          <div class="suggestion-chip" (click)="runPrompt('Write a creative poem about coding')">
+            <mat-icon>edit</mat-icon> Write a poem
+          </div>
+          <div class="suggestion-chip" (click)="runPrompt('Explain quantum computing in simple terms')">
+            <mat-icon>lightbulb</mat-icon> Explain concepts
+          </div>
+        </div>
       </div>
 
-      <div *ngFor="let msg of activeChat?.messages; let i = index">
+      <div *ngFor="let msg of activeChat?.messages; let i = index" class="message-wrapper">
         <div class="message" [ngClass]="msg.from">
           <div class="message-content">
             <ng-container *ngIf="msg.from === 'user'">
@@ -53,17 +66,22 @@
                   <span class="typing-dot"></span>
                   <span class="typing-dot"></span>
                 </div>
+
+                <!-- Action Buttons - Always visible after bot message -->
+                <div class="bot-message-actions" *ngIf="msg.text && !isLoading">
+                  <button mat-icon-button class="action-btn" (click)="copyMessage(msg.text)" matTooltip="Copy">
+                    <mat-icon>content_copy</mat-icon>
+                  </button>
+                  <button mat-icon-button class="action-btn"
+                    *ngIf="activeChat?.messages && i === (activeChat?.messages?.length ?? 0) - 1"
+                    (click)="regenerateResponse(i)" matTooltip="Regenerate">
+                    <mat-icon>refresh</mat-icon>
+                  </button>
+                </div>
               </div>
             </ng-container>
           </div>
         </div>
-        <!-- <div
-          *ngIf="msg.from === 'bot' && activeChat?.messages && i === activeChat.messages.length - 1 && !isLoading && lastUserMessage"
-          class="try-again">
-          <span color="primary" (click)="tryAgain()">
-            <mat-icon>loop</mat-icon>
-          </span>
-        </div> -->
       </div>
     </div>
 
