@@ -13,7 +13,7 @@
   <button mat-button color="primary" (click)="startNewChat()">+ New Chat</button>
   <button mat-button color="warn" (click)="clearAllChats()">🗑 Clear All</button>
   <br><br>
-  <h3>Chats History</h3>
+  <h3>Chat History</h3>
   <div class="chat-list">
     <div class="chat-item" *ngFor="let chat of chats" [class.active]="chat.id === activeChat.id">
       <span class="chat-title" (click)="selectChat(chat)">{{ chat.title }}</span>
@@ -36,16 +36,26 @@
 
       <div *ngFor="let msg of activeChat?.messages; let i = index">
         <div class="message" [ngClass]="msg.from">
-          <mat-card>
-            <p *ngIf="msg.from === 'user'">{{ msg.text }}</p>
-            <markdown *ngIf="msg.from === 'bot'" [data]="msg.text"></markdown>
-            <div *ngIf="msg.from === 'bot' && !msg.text && isLoading" class="typing-indicator">
-              <span class="typing-dot"></span>
-              <span class="typing-dot"></span>
-              <span class="typing-dot"></span>
-              <span class="typing-text">Typing...</span>
-            </div>
-          </mat-card>
+          <div class="message-content">
+            <ng-container *ngIf="msg.from === 'user'">
+              <p>{{ msg.text }}</p>
+            </ng-container>
+            <ng-container *ngIf="msg.from === 'bot'">
+              <div class="bot-avatar-container">
+                <div class="bot-avatar">
+                  <mat-icon>smart_toy</mat-icon>
+                </div>
+              </div>
+              <div class="bot-text-container">
+                <markdown [data]="msg.text"></markdown>
+                <div *ngIf="!msg.text && isLoading" class="typing-indicator">
+                  <span class="typing-dot"></span>
+                  <span class="typing-dot"></span>
+                  <span class="typing-dot"></span>
+                </div>
+              </div>
+            </ng-container>
+          </div>
         </div>
         <!-- <div
           *ngIf="msg.from === 'bot' && activeChat?.messages && i === activeChat.messages.length - 1 && !isLoading && lastUserMessage"

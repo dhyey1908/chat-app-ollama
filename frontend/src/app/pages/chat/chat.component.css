@@ -39,53 +39,141 @@
 
 .chat-messages .message {
   display: flex;
-  margin: 12px 0;
+  margin: 24px 0;
+  /* Increased margin for better separation */
   animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  width: 100%;
 }
 
 .chat-messages .message.user {
   justify-content: flex-end;
 }
 
-.chat-messages mat-card {
-  max-width: 70%;
-  padding: 12px 18px;
-  border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  animation: fadeIn 0.3s ease;
-  transition: all 0.3s ease;
+.chat-messages .message.bot {
+  justify-content: flex-start;
 }
 
-.chat-messages mat-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+/* Common message content reset */
+.message-content {
+  max-width: 85%;
+  position: relative;
 }
 
-.chat-messages .message.user mat-card {
+/* User Message Styling - Bubble */
+.message.user .message-content {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
+  padding: 12px 20px;
+  border-radius: 18px 18px 4px 18px;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-.chat-messages .message.bot mat-card {
-  background: #ffffff;
-  color: #1e293b;
-  padding: 1rem 15px;
+.message.user .message-content p {
+  margin: 0;
+}
+
+/* Bot Message Styling - No Box */
+.message.bot .message-content {
+  display: flex;
+  gap: 16px;
+  background: transparent;
+  box-shadow: none;
+  padding: 0;
+  width: 100%;
+  max-width: 90%;
+  /* Allow more width for bot */
+}
+
+.bot-avatar-container {
+  flex-shrink: 0;
+}
+
+.bot-avatar {
+  margin-top: 7px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   display: flex;
   align-items: center;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  justify-content: center;
+  color: white;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.bot-avatar mat-icon {
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.bot-text-container {
+  flex: 1;
+  color: #1e293b;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 0;
+  /* Align with avatar */
+}
+
+/* Markdown Styles for Bot */
+.markdown pre {
+  margin: 12px 0;
+  border-radius: 8px;
+  overflow: hidden !important;
+  /* Ensure rounded corners clip content */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Override Prism Toolbar Position if needed */
+div.code-toolbar>.toolbar {
+  opacity: 1;
+  top: 10px;
+  right: 10px;
+}
+
+div.code-toolbar>.toolbar>.toolbar-item>button {
+  background: rgba(255, 255, 255, 0.1);
+  color: #e0e0e0;
+  border: none;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+div.code-toolbar>.toolbar>.toolbar-item>button:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.markdown code {
+  font-family: 'Fira Code', monospace;
+  font-size: 0.9em;
+}
+
+.markdown p {
+  margin-bottom: 12px;
+}
+
+.markdown p:last-child {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Remove old card styles */
+.chat-messages mat-card,
+.chat-messages .message.user mat-card,
+.chat-messages .message.bot mat-card,
+.chat-messages mat-card:hover {
+  background: none;
+  box-shadow: none;
+  padding: 0;
+  border-radius: 0;
+  transform: none;
+  border: none;
 }
 
 .spacer {
@@ -222,25 +310,26 @@
   margin-left: 250px;
 }
 
-/* Enhanced Typing Indicator */
+/* Enhanced Typing Indicator - Minimal */
 .typing-indicator {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 16px;
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.05) 0%, rgba(118, 75, 162, 0.05) 100%);
-  border-radius: 18px;
-  backdrop-filter: blur(10px);
-  animation: pulse 2s infinite;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+  border-radius: 0;
+  backdrop-filter: none;
+  animation: none;
+  margin-top: 25px;
 }
 
 .typing-dot {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #94a3b8;
   animation: typingPulse 1.4s infinite ease-in-out;
-  box-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+  box-shadow: none;
 }
 
 .typing-dot:nth-child(2) {
@@ -251,12 +340,7 @@
   animation-delay: 0.4s;
 }
 
-.typing-text {
-  color: #667eea;
-  font-size: 13px;
-  font-style: italic;
-  font-weight: 600;
-}
+/* Removed typing-text */
 
 @keyframes typingPulse {
 

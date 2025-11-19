@@ -151,6 +151,7 @@ export class ChatComponent implements OnInit {
               if (this.chats.length > 0) {
                 this.activeChat = this.chats[0];
                 this.historyCleared = false;
+                this.startNewChat();
               } else {
                 this.startNewChat();
               }
