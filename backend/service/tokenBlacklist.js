@@ -1,23 +1,6 @@
-const fs = require("fs");
-const path = require("path");
+const db = require("../db/connection");
 const crypto = require("crypto");
 const jwt = require("jsonwebtoken");
-
-const filePath = path.join(__dirname, "..", "json", "blacklist.json");
-
-let blacklist = {};
-if (fs.existsSync(filePath)) {
-    try {
-        blacklist = JSON.parse(fs.readFileSync(filePath, "utf8"));
-    } catch (err) {
-        console.error("⚠️ Could not read blacklist.json, starting fresh:", err.message);
-        blacklist = {};
-    }
-}
-
-function saveToFile() {
-    fs.writeFileSync(filePath, JSON.stringify(blacklist, null, 2));
-}
 
 function hashToken(token) {
     return crypto.createHash("sha256").update(token).digest("hex");
@@ -36,28 +19,45 @@ async function addToken(token, exp) {
             ? exp
             : decodeExp(token) || Math.floor(Date.now() / 1000) + 3600; // fallback 1 hour
 
-    const key = hashToken(token);
-    blacklist[key] = expiry;
+    const tokenHash = hashToken(token);
 
-    saveToFile();
+    try {
+        await db.query(
+            "INSERT INTO token_blacklist (token_hash, expiry) VALUES (?, ?) ON DUPLICATE KEY UPDATE expiry = VALUES(expiry)",
+            [tokenHash, expiry]
+        );
+    } catch (err) {
+        console.error("Error adding token to blacklist:", err.message);
+    }
 }
 
 async function isBlacklisted(token) {
     if (!token) return false;
 
-    const key = hashToken(token);
-    const expiry = blacklist[key];
-    if (!expiry) return false;
-
+    const tokenHash = hashToken(token);
     const now = Math.floor(Date.now() / 1000);
 
-    if (expiry <= now) {
-        delete blacklist[key];
-        saveToFile();
+    try {
+        const [rows] = await db.query(
+            "SELECT expiry FROM token_blacklist WHERE token_hash = ? AND expiry > ?",
+            [tokenHash, now]
+        );
+
+        if (rows.length > 0) {
+            return true;
+        }
+
+        // Clean up expired tokens
+        await db.query(
+            "DELETE FROM token_blacklist WHERE expiry <= ?",
+            [now]
+        );
+
+        return false;
+    } catch (err) {
+        console.error("Error checking token blacklist:", err.message);
         return false;
     }
-
-    return true;
 }
 
 module.exports = { addToken, isBlacklisted };
