@@ -1,31 +1,74 @@
-<div class="auth-container">
-  <mat-card class="auth-card">
-    <div class="logo">GenieChat</div>
-    <h2>Login</h2>
+<div class="auth-page">
+  <div class="simple-bg"></div>
 
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Email</mat-label>
-      <input matInput type="email" placeholder="you@example.com" [(ngModel)]="email">
-    </mat-form-field>
-
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Password</mat-label>
-      <input matInput type="password" [(ngModel)]="password">
-    </mat-form-field>
-
-    <button mat-raised-button color="primary" class="full-width" (click)="login()">Login</button>
-    <button mat-raised-button color="accent" class="full-width" routerLink="/signup">Sign Up</button>
-
-    <div class="divider">
-      <span>OR</span>
+  <div class="auth-card-wrapper">
+    <div class="brand-header">
+      <div class="logo-container">
+        <img src="assets/images/geniechat-logo.png" alt="GenieChat Logo" class="logo-icon">
+        <span class="logo-text">GenieChat</span>
+      </div>
     </div>
 
-    <button mat-raised-button class="google-btn full-width" (click)="loginWithGoogle()">
-      <mat-icon>google</mat-icon> Continue with Google
-    </button>
+    <div class="auth-card">
+      <div class="auth-tabs">
+        <a routerLink="/login" routerLinkActive="active" class="auth-tab">
+          <mat-icon>login</mat-icon>
+          <span>Sign In</span>
+        </a>
+        <a routerLink="/signup" routerLinkActive="active" class="auth-tab">
+          <mat-icon>person_add</mat-icon>
+          <span>Sign Up</span>
+        </a>
+        <a routerLink="/forgot-password" routerLinkActive="active" class="auth-tab">
+          <mat-icon>lock_reset</mat-icon>
+          <span>Reset</span>
+        </a>
+      </div>
 
-    <p class="forgot">
-      Forgot your password? <a routerLink="/forgot-password">Reset</a>
-    </p>
-  </mat-card>
+      <div class="auth-content">
+        <div class="welcome-section">
+          <h1 class="welcome-title">Welcome Back!</h1>
+          <p class="welcome-subtitle">Sign in to continue</p>
+        </div>
+
+        <button class="social-btn" (click)="loginWithGoogle()">
+          <mat-icon>google</mat-icon>
+          <span>Continue with Google</span>
+        </button>
+
+        <div class="divider">
+          <span>or use email</span>
+        </div>
+
+        <div class="input-wrapper">
+          <mat-icon class="input-icon">email</mat-icon>
+          <input type="email" class="modern-input" placeholder="Email address" [(ngModel)]="email">
+        </div>
+
+        <div class="input-wrapper">
+          <mat-icon class="input-icon">lock</mat-icon>
+          <input type="password" class="modern-input" placeholder="Password" [(ngModel)]="password">
+        </div>
+
+        <div class="options-row">
+          <label class="custom-checkbox">
+            <input type="checkbox">
+            <span class="checkmark"></span>
+            <span class="checkbox-label">Remember me</span>
+          </label>
+          <a routerLink="/forgot-password" class="link-btn">Forgot password?</a>
+        </div>
+
+        <button class="submit-btn" (click)="login()">
+          <span>Sign In</span>
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+
+        <p class="footer-text">
+          Don't have an account?
+          <a routerLink="/signup" class="link-highlight">Create one now</a>
+        </p>
+      </div>
+    </div>
+  </div>
 </div>

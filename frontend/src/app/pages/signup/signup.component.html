@@ -1,40 +1,99 @@
 <form [formGroup]="signupForm">
-  <div class="auth-container">
-    <mat-card class="auth-card">
-      <div class="logo">GenieChat</div>
-      <h2>Create Account</h2>
+  <div class="auth-page">
+    <div class="simple-bg"></div>
 
-      <mat-form-field appearance="outline" class="full-width"
-        [ngClass]="{'error-border': signupForm.get('email')?.invalid && signupForm.get('email')?.touched}">
-        <mat-label>Email</mat-label>
-        <input matInput type="email" formControlName="email" placeholder="you@example.com">
-        <mat-error *ngIf="signupForm.get('email')?.hasError('required')">Email is required</mat-error>
-        <mat-error *ngIf="signupForm.get('email')?.hasError('email')">Invalid email</mat-error>
-      </mat-form-field>
+    <div class="auth-card-wrapper">
+      <div class="brand-header">
+        <div class="logo-container">
+          <img src="assets/images/geniechat-logo.png" alt="GenieChat Logo" class="logo-icon">
+          <span class="logo-text">GenieChat</span>
+        </div>
+      </div>
 
-      <mat-form-field appearance="outline" class="full-width"
-        [ngClass]="{'error-border': signupForm.get('password')?.invalid && signupForm.get('password')?.touched}">
-        <mat-label>Password</mat-label>
-        <input matInput type="password" formControlName="password">
-        <mat-error *ngIf="signupForm.get('password')?.hasError('required') && signupForm.get('password')?.touched">
-          Password is required
-        </mat-error>
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <a routerLink="/login" routerLinkActive="active" class="auth-tab">
+            <mat-icon>login</mat-icon>
+            <span>Sign In</span>
+          </a>
+          <a routerLink="/signup" routerLinkActive="active" class="auth-tab">
+            <mat-icon>person_add</mat-icon>
+            <span>Sign Up</span>
+          </a>
+        </div>
 
-        <mat-error *ngIf="signupForm.get('password')?.hasError('pattern') && signupForm.get('password')?.touched">
-         Use 8+ chars with upper, lower, number & symbol.
-        </mat-error>
+        <div class="auth-content">
+          <div class="welcome-section">
+            <h1 class="welcome-title">Create Account</h1>
+          </div>
 
-      </mat-form-field>
+          <div class="input-wrapper"
+            [class.has-error]="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+            <mat-icon class="input-icon">email</mat-icon>
+            <input type="email" class="modern-input" placeholder="Email address" formControlName="email">
+            <div class="error-msg" *ngIf="signupForm.get('email')?.invalid && signupForm.get('email')?.touched">
+              <span *ngIf="signupForm.get('email')?.hasError('required')">Email is required</span>
+              <span *ngIf="signupForm.get('email')?.hasError('email')">Please enter a valid email</span>
+            </div>
+          </div>
 
-      <mat-form-field appearance="outline" class="full-width"
-        [ngClass]="{'error-border': signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched}">
-        <mat-label>Confirm Password</mat-label>
-        <input matInput type="password" formControlName="confirmPassword">
-        <mat-error>Confirm Password is required</mat-error>
-      </mat-form-field>
+          <div class="input-wrapper"
+            [class.has-error]="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+            <mat-icon class="input-icon">lock</mat-icon>
+            <input type="password" class="modern-input" placeholder="Password" formControlName="password"
+              (input)="checkPasswordStrength()">
 
-      <button mat-raised-button color="primary" class="full-width" (click)="signup()">Sign Up</button>
-      <button mat-stroked-button class="full-width" routerLink="/login">Back to Login</button>
-    </mat-card>
+            <div class="password-strength" *ngIf="signupForm.get('password')?.value">
+              <div class="strength-bars">
+                <div class="bar" [class.active]="passwordStrength >= 1" [class.weak]="passwordStrength === 1"></div>
+                <div class="bar" [class.active]="passwordStrength >= 2" [class.medium]="passwordStrength === 2"></div>
+                <div class="bar" [class.active]="passwordStrength >= 3" [class.strong]="passwordStrength === 3"></div>
+                <div class="bar" [class.active]="passwordStrength >= 4" [class.very-strong]="passwordStrength === 4">
+                </div>
+              </div>
+              <span class="strength-label" [ngClass]="getStrengthClass()">
+                {{ getStrengthText() }}
+              </span>
+            </div>
+
+            <div class="error-msg" *ngIf="signupForm.get('password')?.invalid && signupForm.get('password')?.touched">
+              <span *ngIf="signupForm.get('password')?.hasError('required')">Password is required</span>
+              <span *ngIf="signupForm.get('password')?.hasError('pattern')">Use 8+ chars with upper, lower, number &
+                symbol</span>
+            </div>
+          </div>
+
+          <div class="input-wrapper"
+            [class.has-error]="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched">
+            <mat-icon class="input-icon">lock_check</mat-icon>
+            <input type="password" class="modern-input" placeholder="Confirm password"
+              formControlName="confirmPassword">
+            <div class="error-msg"
+              *ngIf="signupForm.get('confirmPassword')?.invalid && signupForm.get('confirmPassword')?.touched">
+              <span>Passwords do not match</span>
+            </div>
+          </div>
+
+          <label class="custom-checkbox terms-check">
+            <input type="checkbox" required>
+            <span class="checkmark"></span>
+            <span class="checkbox-label">
+              I agree to the <a href="#" class="inline-link">Terms</a> and <a href="#" class="inline-link">Privacy
+                Policy</a>
+            </span>
+          </label>
+
+          <button class="submit-btn" type="button" (click)="signup()" [disabled]="signupForm.invalid">
+            <span>Create Account</span>
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+
+          <p class="footer-text">
+            Already have an account?
+            <a routerLink="/login" class="link-highlight">Sign in instead</a>
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
 </form>
